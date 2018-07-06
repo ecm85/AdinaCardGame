@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace Splendor
+namespace AdinaCardGame
 {
 	internal static class GraphicsExtension
 	{
@@ -185,5 +185,59 @@ namespace Splendor
 				Convert.ToSingle(height),
 				Convert.ToSingle(radius));
 		}
-	}
+
+        //public static void PrintImageWithText(this Graphics graphics, string fileName, int imageX, int imageY, int imageSide, string text, int textImageXOffset, int textImageYOffset)
+        //{
+        //    PrintScaledPng(graphics, fileName, imageX, imageY, imageSide, imageSide);
+        //    var textX = imageX + textImageXOffset;
+        //    var textY = imageY + textImageYOffset;
+        //    var font = new Font(bodyFontFamily, imageLabelFontSize);
+        //    var path = new GraphicsPath();
+        //    path.AddString(
+        //        text,
+        //        font.FontFamily,
+        //        (int)font.Style,
+        //        font.Size,
+        //        new PointF(origin.X + textX, origin.Y + textY),
+        //        new StringFormat());
+        //    graphics.FillPath(Brushes.White, path);
+        //    graphics.DrawPath(new Pen(Color.Black, textOutlineWidth), path);
+        //}
+
+
+
+        //public static void PrintScaledPng(this Graphics graphics, string fileName, int x, int y, int width, int height)
+        //{
+        //    using (var srcImage = Image.FromFile($"Images\\{fileName}.png"))
+        //    {
+        //        PrintScaledImage(graphics, srcImage, x, y, width, height);
+        //    }
+        //}
+
+        //public static void PrintScaledJpg(this Graphics graphics, string fileName, int x, int y, int width, int height)
+        //{
+        //    using (var srcImage = Image.FromFile($"Images\\{fileName}.jpg"))
+        //    {
+        //        PrintScaledImage(graphics, srcImage, x, y, width, height);
+        //    }
+        //}
+
+        //public static void PrintScaledImage(this Graphics graphics, Image image, int x, int y, int width, int height)
+        //{
+        //    graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        //    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        //    graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+        //    graphics.DrawImage(image, new Rectangle(origin.X + x, origin.Y + y, width, height));
+        //}
+
+        //public static void DrawString(this Graphics graphics, string text, Font font, Brush brush, RectangleF rectangle)
+        //{
+        //    graphics.DrawString(text, font, brush, new RectangleF(origin.X + rectangle.X, origin.Y + rectangle.Y, rectangle.Width, rectangle.Height), horizontalCenterAlignment);
+        //}
+
+        //public static void DrawString(this Graphics graphics, string text, Font font, Brush brush, RectangleF rectangle, StringFormat stringFormat)
+        //{
+        //    graphics.DrawString(text, font, brush, new RectangleF(origin.X + rectangle.X, origin.Y + rectangle.Y, rectangle.Width, rectangle.Height), stringFormat);
+        //}
+    }
 }
