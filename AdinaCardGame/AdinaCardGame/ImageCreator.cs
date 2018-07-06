@@ -5,73 +5,67 @@ namespace AdinaCardGame
 {
 	public class ImageCreator
 	{
-		const float dpiFactor = 300.0f / 96;
+		const float DpiFactor = 300.0f / 96;
 
+        //TODO: Make configurable
+		private const float CardShortSideInInches = 2.5f;
+        //TODO: Make configurable
+		private const float CardLongSideInInches = 3.5f;
 
-		private const float cardShortSideInInches = 2.5f;
-		private const float cardLongSideInInches = 3.5f;
+        //TODO: Make configurable
+		private const float BleedSizeInInches = .25f;
 
-		private const float bleedSizeInInches = .25f;
-
-		private const float cardShortSideInInchesWithBleed = cardShortSideInInches + bleedSizeInInches;
-		private const float cardLongSideInInchesWithBleed = cardLongSideInInches + bleedSizeInInches;
+		private const float CardShortSideInInchesWithBleed = CardShortSideInInches + BleedSizeInInches;
+		private const float CardLongSideInInchesWithBleed = CardLongSideInInches + BleedSizeInInches;
 
 		//card: 2.5x3.5 = 240 * 336
-		private const int dpi = (int)(96 * dpiFactor);
-		private const int cardShortSideInPixels = (int)(dpi * cardShortSideInInches);
-		private const int cardLongSideInPixels = (int)(dpi * cardLongSideInInches);
+		private const int Dpi = (int)(96 * DpiFactor);
+		private const int CardShortSideInPixels = (int)(Dpi * CardShortSideInInches);
+		private const int CardLongSideInPixels = (int)(Dpi * CardLongSideInInches);
 
-		private const int cardShortSideInPixelsWithBleed = (int)(dpi * cardShortSideInInchesWithBleed);
-		private const int cardLongSideInPixelsWithBleed = (int)(dpi * cardLongSideInInchesWithBleed);
+		private const int CardShortSideInPixelsWithBleed = (int)(Dpi * CardShortSideInInchesWithBleed);
+		private const int CardLongSideInPixelsWithBleed = (int)(Dpi * CardLongSideInInchesWithBleed);
 
-		private readonly Color standardCardBackgroundColor = Color.BurlyWood;
-		private const string questBackText = "Quest";
-		private readonly FontFamily headerFontFamily = new FontFamily("Tempus Sans ITC");
-		private static readonly FontFamily bodyFontFamily = new FontFamily("Calibri");
-		private static readonly FontFamily cardBackFontFamily = new FontFamily("Cambria");
+        //TODO: Make configurable
+		private readonly FontFamily promptFontFamily = new FontFamily("Arial");
 
-		private readonly StringFormat fullCenterAlignment = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center};
 		private readonly StringFormat horizontalNearAlignment = new StringFormat {Alignment = StringAlignment.Near};
-		private readonly StringFormat horizontalFarAlignment = new StringFormat {Alignment = StringAlignment.Far};
-		private readonly SolidBrush blackBrush = new SolidBrush(Color.Black);
 
-		private Point origin = new Point((int) (bleedSizeInInches * dpi / 2), (int) (bleedSizeInInches * dpi / 2));
+		private readonly Point origin = new Point((int) (BleedSizeInInches * Dpi / 2), (int) (BleedSizeInInches * Dpi / 2));
 
-		private const int borderRadius = 40;
+        //TODO: Make configurable
+		private const int BorderRadius = 40;
 
-		private const float textOutlineWidth = .5f * dpiFactor;
-	    private const int borderPadding = (int)(25 * dpiFactor);
+        //TODO: Make configurable
+	    private const int BorderPadding = (int)(25 * DpiFactor);
 
-        private const int limitsFontSize = (int) (10 * dpiFactor);
-		private const int bodyFontSize = (int) (11 * dpiFactor);
-		private const int questHeaderFontSize = (int) (13 * dpiFactor);
-		private const int toolHeaderFontSize = (int) (20 * dpiFactor);
-		private const int imageLabelFontSize = (int) (20 * dpiFactor);
-		private const int gameTitleFontSize = (int) (38 * dpiFactor);
-		private const int questBackFontSize = (int) (45 * dpiFactor);
-		private const int tierTextFontSize = (int) (80 * dpiFactor);
+		private const int PromptTextFontSize = (int) (13 * DpiFactor);
 
-		private const int resourceKeyImageSize = (int) (35 * dpiFactor);
-		private const int arrowImageSize = (int) (10 * dpiFactor);
-		private const int questCostImageSize = (int) (35 * dpiFactor);
-		private const int pentagonImageSize = (int) (25 * dpiFactor);
-		private const int wreathImageWidth = (int) (40 * dpiFactor);
-		private const int cardFrontSmallImageSize = (int) (35 * dpiFactor);
-		private const int questImageYBottomPadding = (int) (5 * dpiFactor);
+        //TODO: Potentially use these when making logo at bottom of cards
+		//private const int resourceKeyImageSize = (int) (35 * DpiFactor);
+		//private const int arrowImageSize = (int) (10 * DpiFactor);
+		//private const int questCostImageSize = (int) (35 * DpiFactor);
+		//private const int pentagonImageSize = (int) (25 * DpiFactor);
+		//private const int wreathImageWidth = (int) (40 * DpiFactor);
+		//private const int cardFrontSmallImageSize = (int) (35 * DpiFactor);
+		//private const int questImageYBottomPadding = (int) (5 * DpiFactor);
+
+        //TODO: Make configurable
 	    private const string PromptCardFrontBackgroundColorText = "0, 0, 0";
+        //TODO: Make configurable
 	    private const string PromptCardFrontTextColorText = "255, 255, 255";
+        //TODO: Make configurable
 	    private const string AnswerCardFrontBackgroundColorText = "255, 255, 255";
 
-	    private static int ArrowPadding => arrowImageSize / 2;
 
 	    private Bitmap CreateBitmap(ImageOrientation orientation)
 	    {
 	        switch (orientation)
 	        {
 	            case ImageOrientation.Landscape:
-	                return CreateBitmap(cardLongSideInPixelsWithBleed, cardShortSideInPixelsWithBleed);
+	                return CreateBitmap(CardLongSideInPixelsWithBleed, CardShortSideInPixelsWithBleed);
 	            case ImageOrientation.Portrait:
-	                return CreateBitmap(cardShortSideInPixelsWithBleed, cardLongSideInPixelsWithBleed);
+	                return CreateBitmap(CardShortSideInPixelsWithBleed, CardLongSideInPixelsWithBleed);
 	        }
 	        return null;
 	    }
@@ -79,7 +73,7 @@ namespace AdinaCardGame
 	    private Bitmap CreateBitmap(int width, int height)
 	    {
 	        var bitmap = new Bitmap(width, height);
-	        bitmap.SetResolution(dpi, dpi);
+	        bitmap.SetResolution(Dpi, Dpi);
 	        return bitmap;
 	    }
 
@@ -90,14 +84,17 @@ namespace AdinaCardGame
 	        var promptCardFrontBackgroundColor = ParseColorText(PromptCardFrontBackgroundColorText);
 	        var promptCardFrontTextColor = ParseColorText(PromptCardFrontTextColorText);
 	        PrintCardBack(graphics, ImageOrientation.Portrait, promptCardFrontBackgroundColor);
-	        var promptFont = new Font(headerFontFamily, questHeaderFontSize, FontStyle.Bold, GraphicsUnit.Pixel);
+	        var promptFont = new Font(promptFontFamily, PromptTextFontSize, FontStyle.Bold, GraphicsUnit.Pixel);
             graphics.DrawString(
                 origin,
 	            promptCard,
                 promptFont,
                 new SolidBrush(promptCardFrontTextColor),
-	            new RectangleF(borderPadding, borderPadding, cardShortSideInPixels - 2 * borderPadding, cardLongSideInPixels - 2 * borderPadding),
+	            new RectangleF(BorderPadding, BorderPadding, CardShortSideInPixels - 2 * BorderPadding, CardLongSideInPixels - 2 * BorderPadding),
                 horizontalNearAlignment);
+            //TODO: Handle new lines for ___'s
+            //TODO: Find max font size that fits
+            //TODO: Add logo
 
             return bitmap;
 	    }
@@ -109,6 +106,8 @@ namespace AdinaCardGame
 	        var answerCardFrontBackgroundColor = ParseColorText(AnswerCardFrontBackgroundColorText);
 	        PrintCardBack(graphics, ImageOrientation.Portrait, answerCardFrontBackgroundColor);
             //TODO: Print answerCard
+            //TODO: Find max font size that fits
+            //TODO: Add logo
             return bitmap;
 	    }
 
@@ -121,8 +120,8 @@ namespace AdinaCardGame
 
         private void PrintCardBack(Graphics graphics, ImageOrientation orientation, Color backgroundColor)
 	    {
-	        var topSideInPixelsWithBleed = orientation == ImageOrientation.Landscape ? cardLongSideInPixelsWithBleed : cardShortSideInPixelsWithBleed;
-	        var leftSideInPixelsWithBleed = orientation == ImageOrientation.Portrait ? cardLongSideInPixelsWithBleed : cardShortSideInPixelsWithBleed;
+	        var topSideInPixelsWithBleed = orientation == ImageOrientation.Landscape ? CardLongSideInPixelsWithBleed : CardShortSideInPixelsWithBleed;
+	        var leftSideInPixelsWithBleed = orientation == ImageOrientation.Portrait ? CardLongSideInPixelsWithBleed : CardShortSideInPixelsWithBleed;
 
 	        graphics.FillRoundedRectangle(
 	            new SolidBrush(backgroundColor),
@@ -130,7 +129,7 @@ namespace AdinaCardGame
 	            0,
 	            topSideInPixelsWithBleed,
 	            leftSideInPixelsWithBleed,
-	            borderRadius);
+	            BorderRadius);
 	    }
     }
 }

@@ -15,8 +15,6 @@ namespace AdinaCardGame
 		    var promptCards = LoadPromptCards();
 		    var answerCards = LoadAnswerCards();
 
-			//var toolFrontImages = newCards.Select((newCard, i) => new ImageToSave {Image = imageCreator.CreateToolCardFront(newCard), Name = $"Tier {newCard.Tier} Front - {newCard.Name} {i}"}).ToList();
-			//var toolBackImages = Enumerable.Range(1, 3).Select(index => new ImageToSave {Image = imageCreator.CreateToolCardBack(index), Name = $"Tier {index} Back"});
 		    var promptCardFrontImages = promptCards
 		        .Select(
 		            (promptCard, index) => new ImageToSave
