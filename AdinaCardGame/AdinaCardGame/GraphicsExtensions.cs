@@ -4,9 +4,11 @@ using System.Drawing.Drawing2D;
 
 namespace AdinaCardGame
 {
-	internal static class GraphicsExtension
+	public static class GraphicsExtension
 	{
-		private static GraphicsPath GenerateRoundedRectangle(
+		private static readonly StringFormat HorizontalCenterAlignment = new StringFormat { Alignment = StringAlignment.Center};
+
+	    private static GraphicsPath GenerateRoundedRectangle(
 			this Graphics graphics,
 			RectangleF rectangle,
 			float radius)
@@ -230,14 +232,14 @@ namespace AdinaCardGame
         //    graphics.DrawImage(image, new Rectangle(origin.X + x, origin.Y + y, width, height));
         //}
 
-        //public static void DrawString(this Graphics graphics, string text, Font font, Brush brush, RectangleF rectangle)
-        //{
-        //    graphics.DrawString(text, font, brush, new RectangleF(origin.X + rectangle.X, origin.Y + rectangle.Y, rectangle.Width, rectangle.Height), horizontalCenterAlignment);
-        //}
+        public static void DrawString(this Graphics graphics, Point origin, string text, Font font, Brush brush, RectangleF rectangle)
+        {
+            graphics.DrawString(text, font, brush, new RectangleF(origin.X + rectangle.X, origin.Y + rectangle.Y, rectangle.Width, rectangle.Height), HorizontalCenterAlignment);
+        }
 
-        //public static void DrawString(this Graphics graphics, string text, Font font, Brush brush, RectangleF rectangle, StringFormat stringFormat)
-        //{
-        //    graphics.DrawString(text, font, brush, new RectangleF(origin.X + rectangle.X, origin.Y + rectangle.Y, rectangle.Width, rectangle.Height), stringFormat);
-        //}
+        public static void DrawString(this Graphics graphics, Point origin, string text, Font font, Brush brush, RectangleF rectangle, StringFormat stringFormat)
+        {
+            graphics.DrawString(text, font, brush, new RectangleF(origin.X + rectangle.X, origin.Y + rectangle.Y, rectangle.Width, rectangle.Height), stringFormat);
+        }
     }
 }

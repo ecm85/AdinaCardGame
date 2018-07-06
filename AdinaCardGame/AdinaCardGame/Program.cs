@@ -72,7 +72,7 @@ namespace AdinaCardGame
 	    private static IEnumerable<string> LoadPromptCards()
 	    {
             //TODO: Load words from file, one per line, from configurable location
-	        return new [] {"First Prompt", "Second Prompt" };
+	        return new [] { "In a world ravaged by __________ our only solace is __________.", "Second Prompt" };
 	    }
 	}
 }

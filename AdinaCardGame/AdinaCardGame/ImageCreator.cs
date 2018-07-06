@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
 
 namespace AdinaCardGame
 {
@@ -32,7 +30,6 @@ namespace AdinaCardGame
 		private static readonly FontFamily bodyFontFamily = new FontFamily("Calibri");
 		private static readonly FontFamily cardBackFontFamily = new FontFamily("Cambria");
 
-		private readonly StringFormat horizontalCenterAlignment = new StringFormat { Alignment = StringAlignment.Center};
 		private readonly StringFormat fullCenterAlignment = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center};
 		private readonly StringFormat horizontalNearAlignment = new StringFormat {Alignment = StringAlignment.Near};
 		private readonly StringFormat horizontalFarAlignment = new StringFormat {Alignment = StringAlignment.Far};
@@ -43,8 +40,9 @@ namespace AdinaCardGame
 		private const int borderRadius = 40;
 
 		private const float textOutlineWidth = .5f * dpiFactor;
+	    private const int borderPadding = (int)(25 * dpiFactor);
 
-		private const int limitsFontSize = (int) (10 * dpiFactor);
+        private const int limitsFontSize = (int) (10 * dpiFactor);
 		private const int bodyFontSize = (int) (11 * dpiFactor);
 		private const int questHeaderFontSize = (int) (13 * dpiFactor);
 		private const int toolHeaderFontSize = (int) (20 * dpiFactor);
@@ -61,6 +59,7 @@ namespace AdinaCardGame
 		private const int cardFrontSmallImageSize = (int) (35 * dpiFactor);
 		private const int questImageYBottomPadding = (int) (5 * dpiFactor);
 	    private const string PromptCardFrontBackgroundColorText = "0, 0, 0";
+	    private const string PromptCardFrontTextColorText = "255, 255, 255";
 	    private const string AnswerCardFrontBackgroundColorText = "255, 255, 255";
 
 	    private static int ArrowPadding => arrowImageSize / 2;
@@ -89,9 +88,18 @@ namespace AdinaCardGame
 			var bitmap = CreateBitmap(ImageOrientation.Portrait);
 			var graphics = Graphics.FromImage(bitmap);
 	        var promptCardFrontBackgroundColor = ParseColorText(PromptCardFrontBackgroundColorText);
+	        var promptCardFrontTextColor = ParseColorText(PromptCardFrontTextColorText);
 	        PrintCardBack(graphics, ImageOrientation.Portrait, promptCardFrontBackgroundColor);
-            //TODO: Print promptCard
-	        return bitmap;
+	        var promptFont = new Font(headerFontFamily, questHeaderFontSize, FontStyle.Bold, GraphicsUnit.Pixel);
+            graphics.DrawString(
+                origin,
+	            promptCard,
+                promptFont,
+                new SolidBrush(promptCardFrontTextColor),
+	            new RectangleF(borderPadding, borderPadding, cardShortSideInPixels - 2 * borderPadding, cardLongSideInPixels - 2 * borderPadding),
+                horizontalNearAlignment);
+
+            return bitmap;
 	    }
 
 	    public Image CreateAnswerCardFront(string answerCard)
