@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Drawing;
 using System.Linq;
 
@@ -9,49 +10,39 @@ namespace AdinaCardGame
 	{
 		const float DpiFactor = 300.0f / 96;
 
-        //TODO: Make configurable
-		private const float CardShortSideInInches = 2.5f;
-        //TODO: Make configurable
-		private const float CardLongSideInInches = 3.5f;
+	    private static float CardWidthInInches => float.Parse(ConfigurationManager.AppSettings["CardWidthInInches"]);
+		private static float CardHeightInInches => float.Parse(ConfigurationManager.AppSettings["CardHeightInInches"]);
 
-        //TODO: Make configurable
-		private const float BleedSizeInInches = .25f;
+		private static float BleedSizeInInches => float.Parse(ConfigurationManager.AppSettings["BleedSizeInInches"]);
 
-		private const float CardShortSideInInchesWithBleed = CardShortSideInInches + BleedSizeInInches;
-		private const float CardLongSideInInchesWithBleed = CardLongSideInInches + BleedSizeInInches;
+		private static float CardWidthInInchesWithBleed => CardWidthInInches + BleedSizeInInches;
+		private static float CardHeightInInchesWithBleed => CardHeightInInches + BleedSizeInInches;
 
-		//card: 2.5x3.5 = 240 * 336
 		private const int Dpi = (int)(96 * DpiFactor);
-		private const int CardShortSideInPixels = (int)(Dpi * CardShortSideInInches);
-		private const int CardLongSideInPixels = (int)(Dpi * CardLongSideInInches);
+		private static int CardWidthInPixels => (int)(Dpi * CardWidthInInches);
+		private static int CardHeightInPixels => (int)(Dpi * CardHeightInInches);
 
-		private const int CardShortSideInPixelsWithBleed = (int)(Dpi * CardShortSideInInchesWithBleed);
-		private const int CardLongSideInPixelsWithBleed = (int)(Dpi * CardLongSideInInchesWithBleed);
+		private static int CardWidthInPixelsWithBleed => (int)(Dpi * CardWidthInInchesWithBleed);
+		private static int CardHeightInPixelsWithBleed => (int)(Dpi * CardHeightInInchesWithBleed);
 
-        //TODO: Make configurable
-		private readonly FontFamily promptFontFamily = new FontFamily("Arial");
-	    //TODO: Make configurable
-	    private readonly FontFamily answerFontFamily = new FontFamily("Arial");
+		private readonly FontFamily promptFontFamily = new FontFamily(ConfigurationManager.AppSettings["PromptFontFamily"]);
+	    private readonly FontFamily answerFontFamily = new FontFamily(ConfigurationManager.AppSettings["AnswerFontFamily"]);
 
         private readonly StringFormat horizontalNearAlignment = new StringFormat {Alignment = StringAlignment.Near};
 
 		private readonly Point origin = new Point((int) (BleedSizeInInches * Dpi / 2), (int) (BleedSizeInInches * Dpi / 2));
 
-        //TODO: Make configurable
-		private const int BorderRadius = 40;
+	    private static int BorderRadius => int.Parse(ConfigurationManager.AppSettings["BorderRadius"]);
 
-        //TODO: Make configurable
-	    private const int BorderPadding = (int)(25 * DpiFactor);
+        private static int BorderPadding => (int)(int.Parse(ConfigurationManager.AppSettings["BorderPadding"]) * DpiFactor);
 
-	    private const int TopBorderPadding = BorderPadding;
-	    private const int RightBorderPadding = BorderPadding;
-	    private const int LeftBorderPadding = BorderPadding;
-	    private const int BottomBorderPadding = BorderPadding;
+	    private static int TopBorderPadding => BorderPadding;
+	    private static int RightBorderPadding => BorderPadding;
+	    private static int LeftBorderPadding => BorderPadding;
+	    private static int BottomBorderPadding => BorderPadding;
 
-        //TODO: Make configurable
-        private const int MaxPromptTextFontSize = (int) (20 * DpiFactor);
-	    //TODO: Make configurable
-	    private const int MaxAnswerTextFontSize = (int)(20 * DpiFactor);
+        private static int MaxPromptTextFontSize => (int) (int.Parse(ConfigurationManager.AppSettings["MaxPromptTextFontSize"]) * DpiFactor);
+	    private static int MaxAnswerTextFontSize => (int)(int.Parse(ConfigurationManager.AppSettings["MaxAnswerTextFontSize"]) * DpiFactor);
 
         //TODO: Potentially use these when making logo at bottom of cards
         //private const int resourceKeyImageSize = (int) (35 * DpiFactor);
@@ -62,23 +53,19 @@ namespace AdinaCardGame
         //private const int cardFrontSmallImageSize = (int) (35 * DpiFactor);
         //private const int questImageYBottomPadding = (int) (5 * DpiFactor);
 
-        //TODO: Make configurable
-        private const string PromptCardFrontBackgroundColorText = "0, 0, 0";
-        //TODO: Make configurable
-	    private const string PromptCardFrontTextColorText = "255, 255, 255";
-        //TODO: Make configurable
-	    private const string AnswerCardFrontBackgroundColorText = "255, 255, 255";
-	    //TODO: Make configurable
-	    private const string AnswerCardFrontTextColorText = "0, 0, 0";
+        private static string PromptCardFrontBackgroundColorText => ConfigurationManager.AppSettings["PromptCardFrontBackgroundColor"];
+	    private static string PromptCardFrontTextColorText => ConfigurationManager.AppSettings["PromptCardFrontTextColor"];
+	    private static string AnswerCardFrontBackgroundColorText => ConfigurationManager.AppSettings["AnswerCardFrontBackgroundColor"];
+        private static string AnswerCardFrontTextColorText => ConfigurationManager.AppSettings["AnswerCardFrontTextColor"];
 
         private Bitmap CreateBitmap(ImageOrientation orientation)
 	    {
 	        switch (orientation)
 	        {
 	            case ImageOrientation.Landscape:
-	                return CreateBitmap(CardLongSideInPixelsWithBleed, CardShortSideInPixelsWithBleed);
+	                return CreateBitmap(CardHeightInPixelsWithBleed, CardWidthInPixelsWithBleed);
 	            case ImageOrientation.Portrait:
-	                return CreateBitmap(CardShortSideInPixelsWithBleed, CardLongSideInPixelsWithBleed);
+	                return CreateBitmap(CardWidthInPixelsWithBleed, CardHeightInPixelsWithBleed);
 	        }
 	        return null;
 	    }
@@ -141,7 +128,7 @@ namespace AdinaCardGame
 
 	    private float GetTextFontSize(float maxFontSize, IList<string> promptCardTokens, float yOffset, Graphics graphics)
 	    {
-	        var availableHeight = CardLongSideInPixels - (yOffset + BottomBorderPadding);
+	        var availableHeight = CardHeightInPixels - (yOffset + BottomBorderPadding);
 	        float heightAtNextAttempt;
 	        var nextAttempt = maxFontSize;
             do
@@ -156,7 +143,7 @@ namespace AdinaCardGame
 
 	    private float GetHeightForPromptCardAtFontSize(IList<string> promptCardTokens, Graphics graphics, float fontSize)
 	    {
-	        var availableWidth = CardShortSideInPixels - (LeftBorderPadding + RightBorderPadding);
+	        var availableWidth = CardWidthInPixels - (LeftBorderPadding + RightBorderPadding);
 	        var size = new SizeF(
 	            availableWidth,
 	            float.MaxValue);
@@ -177,8 +164,8 @@ namespace AdinaCardGame
 	        var textRectangle = new RectangleF(
 	            LeftBorderPadding,
 	            yOffset,
-	            CardShortSideInPixels - (LeftBorderPadding + RightBorderPadding),
-	            CardLongSideInPixels - (yOffset + BottomBorderPadding));
+	            CardWidthInPixels - (LeftBorderPadding + RightBorderPadding),
+	            CardHeightInPixels - (yOffset + BottomBorderPadding));
 	        var sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
 
 	        var textToDraw = cardToken.Contains(PromptBlankLine.PromptBlankPlaceholder)
@@ -227,8 +214,8 @@ namespace AdinaCardGame
 
         private void PrintCardBackground(Graphics graphics, ImageOrientation orientation, Color backgroundColor)
 	    {
-	        var topSideInPixelsWithBleed = orientation == ImageOrientation.Landscape ? CardLongSideInPixelsWithBleed : CardShortSideInPixelsWithBleed;
-	        var leftSideInPixelsWithBleed = orientation == ImageOrientation.Portrait ? CardLongSideInPixelsWithBleed : CardShortSideInPixelsWithBleed;
+	        var topSideInPixelsWithBleed = orientation == ImageOrientation.Landscape ? CardHeightInPixelsWithBleed : CardWidthInPixelsWithBleed;
+	        var leftSideInPixelsWithBleed = orientation == ImageOrientation.Portrait ? CardHeightInPixelsWithBleed : CardWidthInPixelsWithBleed;
 
 	        graphics.FillRoundedRectangle(
 	            new SolidBrush(backgroundColor),
