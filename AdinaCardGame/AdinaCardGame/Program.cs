@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace AdinaCardGame
@@ -49,16 +52,17 @@ namespace AdinaCardGame
 					var graphics = Graphics.FromImage(image.Image);
 					graphics.DrawImage(overlay, new Rectangle(0, 0, overlay.Width, overlay.Height), 0, 0, overlay.Width, overlay.Height,
 						GraphicsUnit.Pixel, attributes);
-                //TODO: Make this path configurable anbd alsways put images in a timestamped subfolder 
-					image.Image.Save($"c:\\delete\\images\\{image.Name}.png", ImageFormat.Png);
+				    
 				}
 			}
-			else
-			{
-				foreach (var image in allImages)
-                //TODO: Make this path configurable anbd alsways put images in a timestamped subfolder 
-					image.Image.Save($"c:\\delete\\images\\{image.Name}.png", ImageFormat.Png);
-			}
+		    var outputPath = ConfigurationManager.AppSettings["OutputPath"];
+		    var timeStampedFolder = Path.Combine(
+		        outputPath,
+		        "Images " + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture));
+		    Directory.CreateDirectory(timeStampedFolder);
+            foreach (var image in allImages)
+		        image.Image.Save($"{timeStampedFolder}\\{image.Name}.png", ImageFormat.Png);
+		    
 		}
 
 	    private static IEnumerable<string> LoadAnswerCards()
