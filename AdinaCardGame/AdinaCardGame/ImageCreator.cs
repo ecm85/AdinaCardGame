@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -45,7 +46,8 @@ namespace AdinaCardGame
 	    private const int LeftBorderPadding = BorderPadding;
 	    private const int BottomBorderPadding = BorderPadding;
 
-        private const int PromptTextFontSize = (int) (20 * DpiFactor);
+        //TODO: Make configurable
+        private const int MaxPromptTextFontSize = (int) (20 * DpiFactor);
 
         //TODO: Potentially use these when making logo at bottom of cards
 		//private const int resourceKeyImageSize = (int) (35 * DpiFactor);
@@ -62,11 +64,6 @@ namespace AdinaCardGame
 	    private const string PromptCardFrontTextColorText = "255, 255, 255";
         //TODO: Make configurable
 	    private const string AnswerCardFrontBackgroundColorText = "255, 255, 255";
-
-	    
-
-	    
-
 
 	    private Bitmap CreateBitmap(ImageOrientation orientation)
 	    {
@@ -94,12 +91,13 @@ namespace AdinaCardGame
 	        var promptCardFrontBackgroundColor = ParseColorText(PromptCardFrontBackgroundColorText);
 	        var promptCardFrontTextColor = ParseColorText(PromptCardFrontTextColorText);
 	        PrintCardBackground(graphics, ImageOrientation.Portrait, promptCardFrontBackgroundColor);
-	        var promptFont = new Font(promptFontFamily, PromptTextFontSize, FontStyle.Bold, GraphicsUnit.Pixel);
-	        var promptCardTokens = promptCardText.Split(new[] {PromptBlankLine.PromptBlankIndicator}, StringSplitOptions.RemoveEmptyEntries)
-	            .Select(token => token.Trim())
-	            .ToList();
 
 	        var yOffset = (float)TopBorderPadding;
+            var promptCardTokens = promptCardText.Split(new[] {PromptBlankLine.PromptBlankIndicator}, StringSplitOptions.RemoveEmptyEntries)
+	            .Select(token => token.Trim())
+	            .ToList();
+	        var promptTextFontSize = GetPromptTextFontSize(promptCardTokens, yOffset, graphics);
+	        var promptFont = new Font(promptFontFamily, promptTextFontSize, FontStyle.Regular, GraphicsUnit.Pixel);
 	        foreach (var promptCardToken in promptCardTokens)
 	        {
 	            yOffset = DrawNextPromptToken(
@@ -109,12 +107,38 @@ namespace AdinaCardGame
 	                promptFont,
 	                promptCardFrontTextColor);
 	        }
-	        
-            //TODO: Handle new lines for ___'s
-            //TODO: Find max font size that fits, with a cap
+
             //TODO: Add logo
 
             return bitmap;
+	    }
+
+	    private float GetPromptTextFontSize(IList<string> promptCardTokens, float yOffset, Graphics graphics)
+	    {
+	        var availableHeight = CardLongSideInPixels - (yOffset + BottomBorderPadding);
+	        float heightAtNextAttempt;
+	        float nextAttempt = MaxPromptTextFontSize;
+            do
+            {
+                heightAtNextAttempt = GetHeightForPromptCardAtFontSize(promptCardTokens, graphics, nextAttempt);
+                if (heightAtNextAttempt > availableHeight)
+                    nextAttempt--;
+            } while (heightAtNextAttempt > availableHeight);
+
+	        return nextAttempt;
+	    }
+
+	    private float GetHeightForPromptCardAtFontSize(IList<string> promptCardTokens, Graphics graphics, float nextAttempt)
+	    {
+	        var availableWidth = CardShortSideInPixels - (LeftBorderPadding + RightBorderPadding);
+	        var size = new SizeF(
+	            availableWidth,
+	            float.MaxValue);
+	        var maxFont = new Font(promptFontFamily, nextAttempt, FontStyle.Regular, GraphicsUnit.Pixel);
+	        return promptCardTokens
+	            .Sum(
+	                promptCardToken =>
+	                    graphics.MeasureString(promptCardToken, maxFont, size).Height);
 	    }
 
 	    private float DrawNextPromptToken(

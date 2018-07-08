@@ -4,7 +4,7 @@
     {
         public PromptBlankLine(string originalText)
         {
-            var indexOfPlaceholder = originalText.IndexOf(PromptBlankLine.PromptBlankPlaceholder);
+            var indexOfPlaceholder = originalText.IndexOf(PromptBlankPlaceholder);
             CharactersBeforeBlank = originalText.Substring(0, indexOfPlaceholder);
             CharactersAfterBlank = indexOfPlaceholder + 1 < originalText.Length ?
                 originalText.Substring(indexOfPlaceholder + 1, originalText.Length - (indexOfPlaceholder + 1)) :
