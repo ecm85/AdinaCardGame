@@ -67,21 +67,20 @@ namespace AdinaCardGame
 
 	    private static IEnumerable<string> LoadAnswerCards()
 	    {
-            //TODO: Load words from file, one per line, from configurable location
-            //TODO: Ignore comments in file
-	        return new [] {"First Answer", "Second Answer"};
+	        var answerCardPath = ConfigurationManager.AppSettings["AnswerCardPath"];
+	        return File.ReadAllLines(answerCardPath)
+	            .Select(line => line.Trim())
+	            .Where(line => !line.StartsWith("//") && !string.IsNullOrWhiteSpace(line))
+	            .ToList();
 	    }
 
 	    private static IEnumerable<string> LoadPromptCards()
 	    {
-            //TODO: Load words from file, one per line, from configurable location
-            //TODO: Ignore comments in file
-	        return new[]
-            {
-	            "In a world ravaged by @_@ our only solace is that we can use is a long line here that is multiple lines of lorem ipsum stuff @pre-_-post.@",
-	            "@Step 1: _.@ @Step 2: _.@ Step 3: Profit",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-            };
+	        var promptCardPath = ConfigurationManager.AppSettings["PromptCardPath"];
+	        return File.ReadAllLines(promptCardPath)
+	            .Select(line => line.Trim())
+	            .Where(line => !line.StartsWith("//") && !string.IsNullOrWhiteSpace(line))
+	            .ToList();
 	    }
 	}
 }
