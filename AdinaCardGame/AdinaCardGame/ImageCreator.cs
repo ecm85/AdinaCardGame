@@ -63,8 +63,7 @@ namespace AdinaCardGame
         //TODO: Make configurable
 	    private const string AnswerCardFrontBackgroundColorText = "255, 255, 255";
 
-	    private const char PromptBlankIndicator = '@';
-	    private const char PromptBlankPlaceholder = '_';
+	    
 
 	    
 
@@ -94,35 +93,22 @@ namespace AdinaCardGame
 			var graphics = Graphics.FromImage(bitmap);
 	        var promptCardFrontBackgroundColor = ParseColorText(PromptCardFrontBackgroundColorText);
 	        var promptCardFrontTextColor = ParseColorText(PromptCardFrontTextColorText);
-	        PrintCardBack(graphics, ImageOrientation.Portrait, promptCardFrontBackgroundColor);
+	        PrintCardBackground(graphics, ImageOrientation.Portrait, promptCardFrontBackgroundColor);
 	        var promptFont = new Font(promptFontFamily, PromptTextFontSize, FontStyle.Bold, GraphicsUnit.Pixel);
-	        var promptCardTokens = promptCardText.Split(new[] {PromptBlankIndicator}, StringSplitOptions.RemoveEmptyEntries)
+	        var promptCardTokens = promptCardText.Split(new[] {PromptBlankLine.PromptBlankIndicator}, StringSplitOptions.RemoveEmptyEntries)
 	            .Select(token => token.Trim())
 	            .ToList();
 
 	        var yOffset = (float)TopBorderPadding;
 	        foreach (var promptCardToken in promptCardTokens)
 	        {
-	            var textRectangle = new RectangleF(
-	                LeftBorderPadding,
+	            yOffset = DrawNextPromptToken(
 	                yOffset,
-	                CardShortSideInPixels - (LeftBorderPadding + RightBorderPadding),
-	                CardLongSideInPixels - (yOffset + BottomBorderPadding));
-	            var sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
-
-                var textToDraw = (promptCardToken.Contains(PromptBlankPlaceholder)) ?
-                    PadTextWithSpaces(graphics, promptCardToken, promptFont, sizeForText) :
-                    promptCardToken;
-	            yOffset += graphics.MeasureString(textToDraw, promptFont, sizeForText).Height;
-
-	            graphics.DrawString(
-	                origin,
-	                textToDraw,
+	                promptCardToken,
+	                graphics,
 	                promptFont,
-	                new SolidBrush(promptCardFrontTextColor),
-	                textRectangle,
-	                horizontalNearAlignment);
-            }
+	                promptCardFrontTextColor);
+	        }
 	        
             //TODO: Handle new lines for ___'s
             //TODO: Find max font size that fits, with a cap
@@ -131,25 +117,46 @@ namespace AdinaCardGame
             return bitmap;
 	    }
 
+	    private float DrawNextPromptToken(
+	        float yOffset,
+	        string promptCardToken,
+	        Graphics graphics,
+	        Font promptFont,
+	        Color promptCardFrontTextColor)
+	    {
+	        var textRectangle = new RectangleF(
+	            LeftBorderPadding,
+	            yOffset,
+	            CardShortSideInPixels - (LeftBorderPadding + RightBorderPadding),
+	            CardLongSideInPixels - (yOffset + BottomBorderPadding));
+	        var sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
+
+	        var textToDraw = (promptCardToken.Contains(PromptBlankLine.PromptBlankPlaceholder))
+	            ? PadTextWithSpaces(graphics, promptCardToken, promptFont, sizeForText)
+	            : promptCardToken;
+	        yOffset += graphics.MeasureString(textToDraw, promptFont, sizeForText).Height;
+
+	        graphics.DrawString(
+	            origin,
+	            textToDraw,
+	            promptFont,
+	            new SolidBrush(promptCardFrontTextColor),
+	            textRectangle,
+	            horizontalNearAlignment);
+	        return yOffset;
+	    }
+
 	    private string PadTextWithSpaces(Graphics graphics, string textToPad, Font font, SizeF sizeForText)
 	    {
-            if (textToPad.Count(character => character == PromptBlankPlaceholder) > 1)
+            if (textToPad.Count(character => character == PromptBlankLine.PromptBlankPlaceholder) > 1)
                 throw new InvalidOperationException("Multiple blank placeholders in one line.");
-	        var indexOfPlaceholder = textToPad.IndexOf(PromptBlankPlaceholder);
-	        var charactersBeforePlaceholder = textToPad.Substring(0, indexOfPlaceholder);
-            var charactersAfterPlaceholder = indexOfPlaceholder + 1 < textToPad.Length ?
-                textToPad.Substring(indexOfPlaceholder + 1, textToPad.Length - (indexOfPlaceholder + 1)) :
-	            "";
-	        var numberOfDashes = 0;
-	        string dashesToInsert;
+            var promptBlankLine = new PromptBlankLine(textToPad);
 	        bool fitsInOneLine;
 	        do
 	        {
-	            numberOfDashes++;
-	            dashesToInsert = new string(PromptBlankPlaceholder, numberOfDashes + 1);
-	            var nextAttempt = $"{charactersBeforePlaceholder}{dashesToInsert}{charactersAfterPlaceholder}";
+	            promptBlankLine.BlankLength++;
 	            graphics.MeasureString(
-	                nextAttempt,
+	                promptBlankLine.FullLineText,
 	                font,
 	                sizeForText,
 	                StringFormat.GenericDefault,
@@ -157,10 +164,8 @@ namespace AdinaCardGame
 	                out var linesFitted);
 	            fitsInOneLine = linesFitted == 1;
 	        } while (fitsInOneLine);
-
-	        dashesToInsert = new string(PromptBlankPlaceholder, numberOfDashes);
-
-            return $"{charactersBeforePlaceholder}{dashesToInsert}{charactersAfterPlaceholder}";
+	        promptBlankLine.BlankLength--;
+            return promptBlankLine.FullLineText;
 	    }
 
 	    public Image CreateAnswerCardFront(string answerCard)
@@ -168,7 +173,7 @@ namespace AdinaCardGame
 	        var bitmap = CreateBitmap(ImageOrientation.Portrait);
 	        var graphics = Graphics.FromImage(bitmap);
 	        var answerCardFrontBackgroundColor = ParseColorText(AnswerCardFrontBackgroundColorText);
-	        PrintCardBack(graphics, ImageOrientation.Portrait, answerCardFrontBackgroundColor);
+	        PrintCardBackground(graphics, ImageOrientation.Portrait, answerCardFrontBackgroundColor);
             //TODO: Print answerCard
             //TODO: Find max font size that fits
             //TODO: Add logo
@@ -182,7 +187,7 @@ namespace AdinaCardGame
 	        return color;
 	    }
 
-        private void PrintCardBack(Graphics graphics, ImageOrientation orientation, Color backgroundColor)
+        private void PrintCardBackground(Graphics graphics, ImageOrientation orientation, Color backgroundColor)
 	    {
 	        var topSideInPixelsWithBleed = orientation == ImageOrientation.Landscape ? CardLongSideInPixelsWithBleed : CardShortSideInPixelsWithBleed;
 	        var leftSideInPixelsWithBleed = orientation == ImageOrientation.Portrait ? CardLongSideInPixelsWithBleed : CardShortSideInPixelsWithBleed;
