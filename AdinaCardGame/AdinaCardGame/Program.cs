@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 
 namespace AdinaCardGame
 {
-	class Program
+	public class Program
 	{
-		private static bool useOverlay = false;
+		private static bool UseOverlay => bool.Parse(ConfigurationManager.AppSettings["OverlayTemplate"]);
         //TODO: UI?
 		static void Main()
 		{
@@ -36,12 +37,11 @@ namespace AdinaCardGame
                 .Concat(answerCardFrontImages)
 		        .ToList();
 
-			if (useOverlay)
+			if (UseOverlay)
 			{
-                //TODO: Make this path configurable, and figure out what to use for it
-				var overlay = new Bitmap("c:\\delete\\poker-card.png");
+				var overlay = new Bitmap(ConfigurationManager.AppSettings["TemplatePath"]);
 				overlay.SetResolution(300, 300);
-				var matrix = new ColorMatrix {Matrix33 = .5f};
+				var matrix = new ColorMatrix {Matrix33 = .1f};
 				var attributes = new ImageAttributes();
 				attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 				foreach (var image in allImages)
