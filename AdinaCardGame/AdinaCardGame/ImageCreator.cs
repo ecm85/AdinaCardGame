@@ -45,7 +45,7 @@ namespace AdinaCardGame
 	    private const int LeftBorderPadding = BorderPadding;
 	    private const int BottomBorderPadding = BorderPadding;
 
-        private const int PromptTextFontSize = (int) (13 * DpiFactor);
+        private const int PromptTextFontSize = (int) (20 * DpiFactor);
 
         //TODO: Potentially use these when making logo at bottom of cards
 		//private const int resourceKeyImageSize = (int) (35 * DpiFactor);
@@ -108,11 +108,11 @@ namespace AdinaCardGame
 	                yOffset,
 	                CardShortSideInPixels - (LeftBorderPadding + RightBorderPadding),
 	                CardLongSideInPixels - (yOffset + BottomBorderPadding));
+	            var sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
 
                 var textToDraw = (promptCardToken.Contains(PromptBlankPlaceholder)) ?
-                    PadTextWithSpaces(promptCardToken, promptFont, textRectangle) :
+                    PadTextWithSpaces(graphics, promptCardToken, promptFont, sizeForText) :
                     promptCardToken;
-                var sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
 	            yOffset += graphics.MeasureString(textToDraw, promptFont, sizeForText).Height;
 
 	            graphics.DrawString(
@@ -125,24 +125,42 @@ namespace AdinaCardGame
             }
 	        
             //TODO: Handle new lines for ___'s
-            //TODO: Find max font size that fits
+            //TODO: Find max font size that fits, with a cap
             //TODO: Add logo
 
             return bitmap;
 	    }
 
-	    private string PadTextWithSpaces(string textToPad, Font font, RectangleF textRectangle)
+	    private string PadTextWithSpaces(Graphics graphics, string textToPad, Font font, SizeF sizeForText)
 	    {
             if (textToPad.Count(character => character == PromptBlankPlaceholder) > 1)
                 throw new InvalidOperationException("Multiple blank placeholders in one line.");
 	        var indexOfPlaceholder = textToPad.IndexOf(PromptBlankPlaceholder);
 	        var charactersBeforePlaceholder = textToPad.Substring(0, indexOfPlaceholder);
-            //TODO: verify this math
             var charactersAfterPlaceholder = indexOfPlaceholder + 1 < textToPad.Length ?
                 textToPad.Substring(indexOfPlaceholder + 1, textToPad.Length - (indexOfPlaceholder + 1)) :
 	            "";
-            //TODO: Measure and add _ in between first and last until reaches full line
-	        return $"{charactersBeforePlaceholder}_____{charactersAfterPlaceholder}";
+	        var numberOfDashes = 0;
+	        string dashesToInsert;
+	        bool fitsInOneLine;
+	        do
+	        {
+	            numberOfDashes++;
+	            dashesToInsert = new string(PromptBlankPlaceholder, numberOfDashes + 1);
+	            var nextAttempt = $"{charactersBeforePlaceholder}{dashesToInsert}{charactersAfterPlaceholder}";
+	            graphics.MeasureString(
+	                nextAttempt,
+	                font,
+	                sizeForText,
+	                StringFormat.GenericDefault,
+	                out _,
+	                out var linesFitted);
+	            fitsInOneLine = linesFitted == 1;
+	        } while (fitsInOneLine);
+
+	        dashesToInsert = new string(PromptBlankPlaceholder, numberOfDashes);
+
+            return $"{charactersBeforePlaceholder}{dashesToInsert}{charactersAfterPlaceholder}";
 	    }
 
 	    public Image CreateAnswerCardFront(string answerCard)

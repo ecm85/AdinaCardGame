@@ -70,7 +70,11 @@ namespace AdinaCardGame
 	    private static IEnumerable<string> LoadPromptCards()
 	    {
             //TODO: Load words from file, one per line, from configurable location
-	        return new [] { "In a world ravaged by @_@ our only solace is that we can use is a long line here that is multiple lines of lorem ipsum stuff @pre-_.@", "Second Prompt" };
+	        return new[]
+	        {
+	            "In a world ravaged by @_@ our only solace is that we can use is a long line here that is multiple lines of lorem ipsum stuff @pre-_-post.@",
+	            "@Step 1: _.@ @Step 2: _.@ Step 3: Profit"
+	        };
 	    }
 	}
 }
