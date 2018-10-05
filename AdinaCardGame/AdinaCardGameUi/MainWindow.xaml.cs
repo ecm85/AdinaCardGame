@@ -32,10 +32,12 @@ namespace AdinaCardGameUi
         {
             PromptPathLabel.Content = "Prompt file: " + ImageCreationProcess.PromptCardPath;
             AnswerPathLabel.Content = "Answer file: " + ImageCreationProcess.AnswerCardPath;
+            ImageCreationProgressText.Content = "";
+            ImageCreationProgressBar.Visibility = Visibility.Hidden;
             base.OnInitialized(e);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (!File.Exists(ImageCreationProcess.PromptCardPath))
             {
@@ -60,14 +62,28 @@ namespace AdinaCardGameUi
 
             try
             {
+                var progress = new Progress<ImageCreationProgress>();
                 var imageCreationProcess = new ImageCreationProcess();
-                var timeStampedFolder = imageCreationProcess.Run();
+                progress.ProgressChanged += UpdateProgress;
+                CreateImagesButton.IsEnabled = false;
+                ImageCreationProgressBar.Visibility = Visibility.Visible;
+                var timeStampedFolder = await Task.Run(() => imageCreationProcess.Run(progress));
+                ImageCreationProgressBar.Visibility = Visibility.Hidden;
+                CreateImagesButton.IsEnabled = true;
+                ImageCreationProgressText.Content = "";
                 MessageBox.Show($"Images have been created at : {timeStampedFolder}");
             }
             catch (Exception exception)
             {
                 MessageBox.Show($"Error encountered. Please send Ezra the following:\n{exception}");
             }
+        }
+
+        public void UpdateProgress(object sender, ImageCreationProgress progress)
+        {
+            ImageCreationProgressBar.Maximum = progress.Total;
+            ImageCreationProgressBar.Value = progress.Complete;
+            ImageCreationProgressText.Content = progress.MostRecentFileComplete;
         }
     }
 }

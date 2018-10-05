@@ -133,7 +133,7 @@ namespace AdinaCardGame
 	        var nextAttempt = maxFontSize;
             do
             {
-                heightAtNextAttempt = GetHeightForPromptCardAtFontSize(promptCardTokens, graphics, nextAttempt);
+                heightAtNextAttempt = GetHeightForCardAtFontSize(promptCardTokens, graphics, nextAttempt);
                 if (heightAtNextAttempt > availableHeight)
                     nextAttempt--;
             } while (heightAtNextAttempt > availableHeight);
@@ -141,7 +141,7 @@ namespace AdinaCardGame
 	        return nextAttempt;
 	    }
 
-	    private float GetHeightForPromptCardAtFontSize(IList<string> promptCardTokens, Graphics graphics, float fontSize)
+	    private float GetHeightForCardAtFontSize(IList<string> promptCardTokens, Graphics graphics, float fontSize)
 	    {
 	        var availableWidth = CardWidthInPixels - (LeftBorderPadding + RightBorderPadding);
 	        var size = new SizeF(
@@ -151,7 +151,7 @@ namespace AdinaCardGame
 	        return promptCardTokens
 	            .Sum(
 	                promptCardToken =>
-	                    graphics.MeasureString(promptCardToken, maxFont, size).Height);
+	                    graphics.MeasureString(promptCardToken, maxFont, size, StringFormat.GenericDefault).Height);
 	    }
 
 	    private float DrawNextStringToken(
@@ -171,7 +171,7 @@ namespace AdinaCardGame
 	        var textToDraw = cardToken.Contains(PromptBlankLine.PromptBlankPlaceholder)
 	            ? PadTextWithSpaces(graphics, cardToken, font, sizeForText)
 	            : cardToken;
-	        yOffset += graphics.MeasureString(textToDraw, font, sizeForText).Height;
+	        yOffset += graphics.MeasureString(textToDraw, font, sizeForText, StringFormat.GenericDefault).Height;
 
 	        graphics.DrawString(
 	            origin,
@@ -197,9 +197,9 @@ namespace AdinaCardGame
 	                font,
 	                sizeForText,
 	                StringFormat.GenericDefault,
-	                out _,
+	                out var charactersFitted,
 	                out var linesFitted);
-	            fitsInOneLine = linesFitted == 1;
+	            fitsInOneLine = charactersFitted == promptBlankLine.FullLineText.Length && linesFitted == 1;
 	        } while (fitsInOneLine);
 	        promptBlankLine.BlankLength--;
             return promptBlankLine.FullLineText;

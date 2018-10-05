@@ -64,8 +64,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CardToGenerate.cs" />
     <Compile Include="GraphicsExtensions.cs" />
     <Compile Include="ImageCreationProcess.cs" />
+    <Compile Include="ImageCreationProgress.cs" />
     <Compile Include="ImageCreator.cs" />
     <Compile Include="ImageOrientation.cs" />
     <Compile Include="ImageToSave.cs" />
