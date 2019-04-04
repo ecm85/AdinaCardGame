@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Svg;
 
 namespace AdinaCardGame
@@ -244,12 +245,12 @@ namespace AdinaCardGame
 	    {
 
             var currentLine = "";
-	        var tokens = input.Split(new [] {" "}, StringSplitOptions.RemoveEmptyEntries).ToList();
+	        var tokens = Regex.Split(input, @"(?<=[ -])").ToList();
             var heightOfFirstToken = graphics.MeasureString(tokens[0], font, sizeForText, StringFormat.GenericDefault).Height;
             while (tokens.Any())
             {
                 var nextToken = tokens[0];
-                var lineWithNextToken = string.IsNullOrWhiteSpace(currentLine) ? nextToken : $"{currentLine} {nextToken}";
+                var lineWithNextToken = string.IsNullOrWhiteSpace(currentLine) ? nextToken : $"{currentLine}{nextToken}";
                 var heightWithNextToken = graphics.MeasureString(lineWithNextToken, font, sizeForText, StringFormat.GenericDefault).Height;
                 if (heightWithNextToken - heightOfFirstToken > 0.0)
                 {
