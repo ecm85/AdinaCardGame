@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using Svg;
 
 namespace AdinaCardGame
 {
@@ -7,7 +8,7 @@ namespace AdinaCardGame
     {
         public int Index { get; set; }
         public string Card { get; set; }
-        public Func<string, Image> CreateImage { get; set; }
+        public Func<string, SvgDocument> CreateImage { get; set; }
         public string FilePrefix { get; set; }
     }
 }

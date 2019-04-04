@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
 using System.Linq;
+using Svg;
 
 namespace AdinaCardGame
 {
@@ -27,8 +28,6 @@ namespace AdinaCardGame
 
 		private readonly FontFamily promptFontFamily = new FontFamily(ConfigurationManager.AppSettings["PromptFontFamily"]);
 	    private readonly FontFamily answerFontFamily = new FontFamily(ConfigurationManager.AppSettings["AnswerFontFamily"]);
-
-        private readonly StringFormat horizontalNearAlignment = new StringFormat {Alignment = StringAlignment.Near};
 
 		private readonly Point origin = new Point((int) (BleedSizeInInches * Dpi / 2), (int) (BleedSizeInInches * Dpi / 2));
 
@@ -77,7 +76,7 @@ namespace AdinaCardGame
 	        return bitmap;
 	    }
 
-	    public Image CreatePromptCardFront(string promptCardText)
+	    public SvgDocument CreatePromptCardFront(string promptCardText)
 	    {
 	        var cardTokens = promptCardText.Split(new[] { PromptBlankLine.PromptBlankIndicator }, StringSplitOptions.RemoveEmptyEntries)
 	            .Select(token => token.Trim())
@@ -90,7 +89,7 @@ namespace AdinaCardGame
             return CreateCardFront(cardFrontBackgroundColor, maxFontSize, cardTokens, fontFamily, cardFrontTextColor);
 	    }
 
-	    public Image CreateAnswerCardFront(string answerCard)
+	    public SvgDocument CreateAnswerCardFront(string answerCard)
 	    {
 	        var cardTokens = new[] { answerCard };
 	        var cardFrontBackgroundColor = ParseColorText(AnswerCardFrontBackgroundColorText);
@@ -101,29 +100,35 @@ namespace AdinaCardGame
 	        return CreateCardFront(cardFrontBackgroundColor, maxFontSize, cardTokens, fontFamily, cardFrontTextColor);
 	    }
 
-        private Image CreateCardFront(Color cardFrontBackgroundColor, int maxFontSize, IList<string> cardTokens, FontFamily fontFamily,
+        private SvgDocument CreateCardFront(Color cardFrontBackgroundColor, int maxFontSize, IList<string> cardTokens, FontFamily fontFamily,
 	        Color cardFrontTextColor)
-	    {
-	        var bitmap = CreateBitmap(ImageOrientation.Portrait);
-	        var graphics = Graphics.FromImage(bitmap);
-	        PrintCardBackground(graphics, ImageOrientation.Portrait, cardFrontBackgroundColor);
+        {
+            //return CreateBitmap(CardWidthInPixelsWithBleed, CardHeightInPixelsWithBleed);
+            var bitmap = CreateBitmap(ImageOrientation.Portrait);
+            var document = new SvgDocument
+            {
+                ViewBox = new SvgViewBox(0, 0, CardWidthInPixelsWithBleed, CardHeightInPixelsWithBleed)
+            };
+            var graphics = Graphics.FromImage(bitmap);
+            PrintCardBackground(document, cardFrontBackgroundColor);
 
-	        var yOffset = (float) TopBorderPadding;
-	        var textFontSize = GetTextFontSize(maxFontSize, cardTokens, yOffset, graphics);
-	        var font = new Font(fontFamily, textFontSize, FontStyle.Regular, GraphicsUnit.Pixel);
-	        foreach (var cardToken in cardTokens)
-	        {
-	            yOffset = DrawNextStringToken(
-	                yOffset,
-	                cardToken,
-	                graphics,
-	                font,
-	                cardFrontTextColor);
-	        }
+            var yOffset = (float)TopBorderPadding;
+            var textFontSize = GetTextFontSize(maxFontSize, cardTokens, yOffset, graphics);
+            foreach (var cardToken in cardTokens)
+            {
+                yOffset = DrawNextStringToken(
+                    yOffset,
+                    cardToken,
+                    document,
+                    graphics,
+                    fontFamily,
+                    textFontSize,
+                    cardFrontTextColor);
+            }
 
-	        //TODO: Add logo
+            ////TODO: Add logo
 
-	        return bitmap;
+            return document;
 	    }
 
 	    private float GetTextFontSize(float maxFontSize, IList<string> promptCardTokens, float yOffset, Graphics graphics)
@@ -131,13 +136,12 @@ namespace AdinaCardGame
 	        var availableHeight = CardHeightInPixels - (yOffset + BottomBorderPadding);
 	        float heightAtNextAttempt;
 	        var nextAttempt = maxFontSize;
-            do
+	        do
             {
                 heightAtNextAttempt = GetHeightForCardAtFontSize(promptCardTokens, graphics, nextAttempt);
                 if (heightAtNextAttempt > availableHeight)
                     nextAttempt--;
             } while (heightAtNextAttempt > availableHeight);
-
 	        return nextAttempt;
 	    }
 
@@ -157,30 +161,106 @@ namespace AdinaCardGame
 	    private float DrawNextStringToken(
 	        float yOffset,
 	        string cardToken,
-	        Graphics graphics,
-	        Font font,
+	        SvgElement container,
+            Graphics graphics,
+	        FontFamily fontFamily,
+            float textFontSize,
 	        Color textColor)
 	    {
-	        var textRectangle = new RectangleF(
-	            LeftBorderPadding,
-	            yOffset,
-	            CardWidthInPixels - (LeftBorderPadding + RightBorderPadding),
-	            CardHeightInPixels - (yOffset + BottomBorderPadding));
-	        var sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
+	        
+	        if (cardToken.Contains(PromptBlankLine.PromptBlankPlaceholder))
+	        {
+	            var textRectangle = new RectangleF(
+	                LeftBorderPadding,
+	                yOffset,
+	                CardWidthInPixels - (LeftBorderPadding + RightBorderPadding),
+	                CardHeightInPixels - (yOffset + BottomBorderPadding));
+	            var sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
 
-	        var textToDraw = cardToken.Contains(PromptBlankLine.PromptBlankPlaceholder)
-	            ? PadTextWithSpaces(graphics, cardToken, font, sizeForText)
-	            : cardToken;
-	        yOffset += graphics.MeasureString(textToDraw, font, sizeForText, StringFormat.GenericDefault).Height;
+	            var font = new Font(fontFamily, textFontSize, FontStyle.Regular, GraphicsUnit.Pixel);
+                var textToDraw = PadTextWithSpaces(graphics, cardToken, font, sizeForText);
 
-	        graphics.DrawString(
-	            origin,
-	            textToDraw,
-	            font,
-	            new SolidBrush(textColor),
-	            textRectangle,
-	            horizontalNearAlignment);
-	        return yOffset;
+	            yOffset += graphics.MeasureString(textToDraw, font, sizeForText, StringFormat.GenericDefault).Height;
+
+	            var textElement = new SvgText(textToDraw)
+	            {
+	                Fill = new SvgColourServer(textColor),
+	                FontFamily = fontFamily.Name,
+	                FontSize = new SvgUnit(textFontSize),
+	                FontStyle = SvgFontStyle.Normal,
+	                X = new SvgUnitCollection {new SvgUnit(textRectangle.X + origin.X)},
+	                Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + origin.Y)},
+
+	            };
+	            container.Children.Add(textElement);
+
+	            return yOffset;
+	        }
+	        else
+	        {
+	            var textElement = new SvgText
+	            {
+	                Fill = new SvgColourServer(textColor),
+	                FontFamily = fontFamily.Name,
+	                FontSize = new SvgUnit(textFontSize),
+	                FontStyle = SvgFontStyle.Normal
+                };
+	            container.Children.Add(textElement);
+	            var textRectangle = new RectangleF(
+	                LeftBorderPadding,
+	                yOffset,
+	                CardWidthInPixels - (LeftBorderPadding + RightBorderPadding),
+	                CardHeightInPixels - (yOffset + BottomBorderPadding));
+	            var sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
+	            var font = new Font(fontFamily, textFontSize, FontStyle.Regular, GraphicsUnit.Pixel);
+                foreach (var lineToken in GetLineTokens(cardToken, graphics, font, sizeForText))
+	            {
+	                textRectangle = new RectangleF(
+	                    LeftBorderPadding,
+	                    yOffset,
+	                    CardWidthInPixels - (LeftBorderPadding + RightBorderPadding),
+	                    CardHeightInPixels - (yOffset + BottomBorderPadding));
+	                sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
+
+	                font = new Font(fontFamily, textFontSize, FontStyle.Regular, GraphicsUnit.Pixel);
+                    yOffset += graphics.MeasureString(lineToken, font, sizeForText, StringFormat.GenericDefault).Height;
+
+	                var textSpanElement = new SvgTextSpan
+	                {
+	                    X = new SvgUnitCollection {new SvgUnit(textRectangle.X + origin.X)},
+	                    Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + origin.Y)},
+	                    Text = lineToken
+	                };
+	                textElement.Children.Add(textSpanElement);
+	            }
+
+	            return yOffset;
+	        }
+	    }
+
+	    private IEnumerable<string> GetLineTokens(string input, Graphics graphics, Font font, SizeF sizeForText)
+	    {
+
+            var currentLine = "";
+	        var tokens = input.Split(new [] {" "}, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var heightOfFirstToken = graphics.MeasureString(tokens[0], font, sizeForText, StringFormat.GenericDefault).Height;
+            while (tokens.Any())
+            {
+                var nextToken = tokens[0];
+                var lineWithNextToken = string.IsNullOrWhiteSpace(currentLine) ? nextToken : $"{currentLine} {nextToken}";
+                var heightWithNextToken = graphics.MeasureString(lineWithNextToken, font, sizeForText, StringFormat.GenericDefault).Height;
+                if (heightWithNextToken - heightOfFirstToken > 0.0)
+                {
+                    yield return currentLine;
+                    currentLine = "";
+                }
+                else
+                {
+                    currentLine = lineWithNextToken;
+                    tokens.Remove(nextToken);
+                }
+            }
+	        yield return currentLine;
 	    }
 
 	    private string PadTextWithSpaces(Graphics graphics, string textToPad, Font font, SizeF sizeForText)
@@ -212,18 +292,19 @@ namespace AdinaCardGame
 	        return color;
 	    }
 
-        private void PrintCardBackground(Graphics graphics, ImageOrientation orientation, Color backgroundColor)
+        private void PrintCardBackground(SvgDocument document, Color backgroundColor)
 	    {
-	        var topSideInPixelsWithBleed = orientation == ImageOrientation.Landscape ? CardHeightInPixelsWithBleed : CardWidthInPixelsWithBleed;
-	        var leftSideInPixelsWithBleed = orientation == ImageOrientation.Portrait ? CardHeightInPixelsWithBleed : CardWidthInPixelsWithBleed;
-
-	        graphics.FillRoundedRectangle(
-	            new SolidBrush(backgroundColor),
-	            0,
-	            0,
-	            topSideInPixelsWithBleed,
-	            leftSideInPixelsWithBleed,
-	            BorderRadius);
+	        var topSideInPixelsWithBleed = CardHeightInPixelsWithBleed;
+	        var leftSideInPixelsWithBleed = CardWidthInPixelsWithBleed;
+	        var rectangle = new SvgRectangle
+	        {
+	            Fill = new SvgColourServer(backgroundColor),
+	            Width = leftSideInPixelsWithBleed,
+	            Height = topSideInPixelsWithBleed,
+	            CornerRadiusX = BorderRadius,
+	            CornerRadiusY = BorderRadius
+	        };
+	        document.Children.Add(rectangle);
 	    }
     }
 }
