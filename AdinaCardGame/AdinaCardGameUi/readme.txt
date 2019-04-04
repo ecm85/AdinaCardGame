@@ -18,7 +18,7 @@ Configurable values:
     BorderRadius
         This value controls the radius of the rounded corners. It doesn't matter much because they get cut by the printer anyway. 
     
-    BorderPadding
+    BorderPaddingInInches
         This value controls how much space is between the side of the card and the text. You can play with this value to get it looking the way you want. 
     
     MaxPromptTextFontSize
@@ -74,15 +74,3 @@ Configurable values:
 
     OutputPath
         This is where the app will drop the files. It will create a subfolder with the current date and time. 
-
-    
-    TemplatePath
-    OverlayTemplate
-    
-        These control a useful feature to overlay a template from thegamecrafter on top of your image.
-        
-        To use it, download the template (in png form) for the card you're using. 
-        Set the path below to where you downloaded it to.
-        Set the second value to true.
-        
-        You'll see what it does. 
