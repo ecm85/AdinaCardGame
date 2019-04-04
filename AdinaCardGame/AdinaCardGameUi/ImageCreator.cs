@@ -29,11 +29,11 @@ namespace AdinaCardGame
 		private readonly FontFamily promptFontFamily = new FontFamily(ConfigurationManager.AppSettings["PromptFontFamily"]);
 	    private readonly FontFamily answerFontFamily = new FontFamily(ConfigurationManager.AppSettings["AnswerFontFamily"]);
 
-		private readonly Point origin = new Point((int) (BleedSizeInInches * Dpi / 2), (int) (BleedSizeInInches * Dpi / 2));
+		private readonly Point origin = new Point((int) (BleedSizeInInches * Dpi), (int) (BleedSizeInInches * Dpi));
 
 	    private static int BorderRadius => int.Parse(ConfigurationManager.AppSettings["BorderRadius"]);
 
-        private static int BorderPadding => (int)(int.Parse(ConfigurationManager.AppSettings["BorderPadding"]) * DpiFactor);
+        private static int BorderPadding => (int)(float.Parse(ConfigurationManager.AppSettings["BorderPaddingInInches"]) * Dpi);
 
 	    private static int TopBorderPadding => BorderPadding;
 	    private static int RightBorderPadding => BorderPadding;
@@ -180,7 +180,8 @@ namespace AdinaCardGame
 	            var font = new Font(fontFamily, textFontSize, FontStyle.Regular, GraphicsUnit.Pixel);
                 var textToDraw = PadTextWithSpaces(graphics, cardToken, font, sizeForText);
 
-	            yOffset += graphics.MeasureString(textToDraw, font, sizeForText, StringFormat.GenericDefault).Height;
+	            var height = graphics.MeasureString(textToDraw, font, sizeForText, StringFormat.GenericDefault).Height;
+	            yOffset += height;
 
 	            var textElement = new SvgText(textToDraw)
 	            {
@@ -189,7 +190,7 @@ namespace AdinaCardGame
 	                FontSize = new SvgUnit(textFontSize),
 	                FontStyle = SvgFontStyle.Normal,
 	                X = new SvgUnitCollection {new SvgUnit(textRectangle.X + origin.X)},
-	                Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + origin.Y)},
+	                Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + origin.Y + height) },
 
 	            };
 	            container.Children.Add(textElement);
@@ -223,12 +224,13 @@ namespace AdinaCardGame
 	                sizeForText = new SizeF(textRectangle.Width, textRectangle.Height);
 
 	                font = new Font(fontFamily, textFontSize, FontStyle.Regular, GraphicsUnit.Pixel);
-                    yOffset += graphics.MeasureString(lineToken, font, sizeForText, StringFormat.GenericDefault).Height;
+	                var height = graphics.MeasureString(lineToken, font, sizeForText, StringFormat.GenericDefault).Height;
+	                yOffset += height;
 
 	                var textSpanElement = new SvgTextSpan
 	                {
 	                    X = new SvgUnitCollection {new SvgUnit(textRectangle.X + origin.X)},
-	                    Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + origin.Y)},
+	                    Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + origin.Y + height)},
 	                    Text = lineToken
 	                };
 	                textElement.Children.Add(textSpanElement);
