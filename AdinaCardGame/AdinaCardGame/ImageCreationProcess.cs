@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -15,14 +16,14 @@ namespace AdinaCardGame
             float bleedSizeInInches,
             string promptFontFamily,
             string answerFontFamily,
-            int borderRadius,
+            float borderRadius,
             float borderPaddingInInches,
-            int maxPromptTextFontSize,
-            int maxAnswerTextFontSize,
-            string promptCardFrontBackgroundColorText,
-            string promptCardFrontTextColorText,
-            string answerCardFrontBackgroundColorText,
-            string answerCardFrontTextColorText)
+            float maxPromptTextFontSize,
+            float maxAnswerTextFontSize,
+            Color promptCardFrontBackgroundColor,
+            Color promptCardFrontTextColor,
+            Color answerCardFrontBackgroundColor,
+            Color answerCardFrontTextColor)
         {
             var imageCreator = new ImageCreator(
                 cardWidthInInches,
@@ -34,10 +35,10 @@ namespace AdinaCardGame
                 borderPaddingInInches,
                 maxPromptTextFontSize,
                 maxAnswerTextFontSize,
-                promptCardFrontBackgroundColorText,
-                promptCardFrontTextColorText,
-                answerCardFrontBackgroundColorText,
-                answerCardFrontTextColorText);
+                promptCardFrontBackgroundColor,
+                promptCardFrontTextColor,
+                answerCardFrontBackgroundColor,
+                answerCardFrontTextColor);
             var promptCardsToGenerate = promptCards
                 .Select((card, index) => new CardToGenerate
                 {

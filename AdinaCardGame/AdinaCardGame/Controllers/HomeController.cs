@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -16,13 +17,25 @@ namespace AdinaCardGame.Controllers
             return View();
         }
 
-        //TODO: Client - get all numeric values
-        //TODO: Client - make values required
-        //TODO: Client - Get colors via picker?
         //TODO: Classes for all the input?
-        //TODO: Build pipeline
+        //TODO: Validate font
         [HttpPost]
-        public ActionResult GenerateImages(HttpPostedFileBase promptsInputFile, HttpPostedFileBase answersInputFile)
+        public ActionResult GenerateImages(
+            HttpPostedFileBase promptsInputFile, 
+            HttpPostedFileBase answersInputFile,
+            float cardWidthInInches,
+            float cardHeightInInches,
+            float bleedSizeInInches,
+            string promptFontFamily,
+            string answerFontFamily,
+            float borderRadius,
+            float borderPaddingInInches,
+            float maxPromptTextFontSize,
+            float maxAnswerTextFontSize,
+            Color promptCardFrontBackgroundColor,
+            Color promptCardFrontTextColor,
+            Color answerCardFrontBackgroundColor,
+            Color answerCardFrontTextColor)
         {
             var promptCards = GetCardsFromStream(promptsInputFile);
             var answerCards = GetCardsFromStream(answersInputFile);
@@ -30,20 +43,6 @@ namespace AdinaCardGame.Controllers
             var imageCreationProcess = new ImageCreationProcess();
             var dateStamp = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture);
             var fileName = $"Card Images {dateStamp}.zip";
-
-            var cardWidthInInches = 1.75f;
-            var cardHeightInInches = 3f;
-            var bleedSizeInInches = .25f;
-            var promptFontFamily = "Times New Roman";
-            var answerFontFamily = "Arial";
-            var borderRadius = 40;
-            var borderPaddingInInches = .1f;
-            var maxPromptTextFontSize = 15;
-            var maxAnswerTextFontSize = 15;
-            var promptCardFrontBackgroundColorText = "255, 255, 0";
-            var promptCardFrontTextColorText = "0, 0, 0";
-            var answerCardFrontBackgroundColorText = "0, 0, 0";
-            var answerCardFrontTextColorText = "255, 255, 0";
 
             var bytes = imageCreationProcess.Run(
                 promptCards,
@@ -57,10 +56,10 @@ namespace AdinaCardGame.Controllers
                 borderPaddingInInches,
                 maxPromptTextFontSize,
                 maxAnswerTextFontSize,
-                promptCardFrontBackgroundColorText,
-                promptCardFrontTextColorText,
-                answerCardFrontBackgroundColorText,
-                answerCardFrontTextColorText);
+                promptCardFrontBackgroundColor,
+                promptCardFrontTextColor,
+                answerCardFrontBackgroundColor,
+                answerCardFrontTextColor);
             return File(bytes, "application/zip", fileName);
         }
 

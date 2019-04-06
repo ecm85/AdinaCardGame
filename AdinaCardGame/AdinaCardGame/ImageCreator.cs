@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Svg;
@@ -15,14 +16,14 @@ namespace AdinaCardGame
 	        float bleedSizeInInches,
 	        string promptFontFamily,
 	        string answerFontFamily,
-	        int borderRadius,
+	        float borderRadius,
 	        float borderPaddingInInches,
-	        int maxPromptTextFontSize,
-	        int maxAnswerTextFontSize,
-	        string promptCardFrontBackgroundColorText,
-	        string promptCardFrontTextColorText,
-	        string answerCardFrontBackgroundColorText,
-	        string answerCardFrontTextColorText)
+	        float maxPromptTextFontSize,
+	        float maxAnswerTextFontSize,
+	        Color promptCardFrontBackgroundColor,
+	        Color promptCardFrontTextColor,
+	        Color answerCardFrontBackgroundColor,
+	        Color answerCardFrontTextColor)
 	    {
 	        CardWidthInInches = cardWidthInInches;
 	        CardHeightInInches = cardHeightInInches;
@@ -31,10 +32,10 @@ namespace AdinaCardGame
 	        BorderPaddingInInches = borderPaddingInInches;
 	        MaxPromptTextFontSize = maxPromptTextFontSize;
 	        MaxAnswerTextFontSize = maxAnswerTextFontSize;
-	        PromptCardFrontBackgroundColorText = promptCardFrontBackgroundColorText;
-	        PromptCardFrontTextColorText = promptCardFrontTextColorText;
-	        AnswerCardFrontBackgroundColorText = answerCardFrontBackgroundColorText;
-	        AnswerCardFrontTextColorText = answerCardFrontTextColorText;
+	        PromptCardFrontBackgroundColor = promptCardFrontBackgroundColor;
+	        PromptCardFrontTextColor = promptCardFrontTextColor;
+	        AnswerCardFrontBackgroundColor = answerCardFrontBackgroundColor;
+	        AnswerCardFrontTextColor = answerCardFrontTextColor;
 	        PromptFontFamily = new FontFamily(promptFontFamily);
 	        AnswerFontFamily = new FontFamily(answerFontFamily);
 	    }
@@ -60,7 +61,7 @@ namespace AdinaCardGame
 
 		private Point Origin => new Point((int) (BleedSizeInInches * Dpi), (int) (BleedSizeInInches * Dpi));
 
-	    private int BorderRadius { get; }
+	    private float BorderRadius { get; }
 
         private int BorderPadding => (int)(BorderPaddingInInches * Dpi);
 
@@ -73,11 +74,11 @@ namespace AdinaCardGame
 
         private int MaxPromptTextFontSizeInDpi => (int) (MaxPromptTextFontSize * DpiFactor);
 
-	    private int MaxPromptTextFontSize { get; }
+	    private float MaxPromptTextFontSize { get; }
 
 	    private int MaxAnswerTextFontSizeInDpi => (int)(MaxAnswerTextFontSize * DpiFactor);
 
-	    private int MaxAnswerTextFontSize { get; }
+	    private float MaxAnswerTextFontSize { get; }
 
 	    //TODO: Potentially use these when making logo at bottom of cards
         //private const int resourceKeyImageSize = (int) (35 * DpiFactor);
@@ -88,10 +89,10 @@ namespace AdinaCardGame
         //private const int cardFrontSmallImageSize = (int) (35 * DpiFactor);
         //private const int questImageYBottomPadding = (int) (5 * DpiFactor);
 
-        private string PromptCardFrontBackgroundColorText { get; }
-	    private string PromptCardFrontTextColorText { get; }
-	    private string AnswerCardFrontBackgroundColorText { get; }
-        private string AnswerCardFrontTextColorText { get; }
+        private Color PromptCardFrontBackgroundColor { get; }
+	    private Color PromptCardFrontTextColor { get; }
+	    private Color AnswerCardFrontBackgroundColor { get; }
+        private Color AnswerCardFrontTextColor { get; }
 
         private Bitmap CreateBitmap(ImageOrientation orientation)
 	    {
@@ -107,7 +108,7 @@ namespace AdinaCardGame
 
 	    private Bitmap CreateBitmap(int width, int height)
 	    {
-	        var bitmap = new Bitmap(width, height);
+	        var bitmap = new Bitmap(width, height, PixelFormat.Format16bppRgb555);
 	        bitmap.SetResolution(Dpi, Dpi);
 	        return bitmap;
 	    }
@@ -117,57 +118,57 @@ namespace AdinaCardGame
 	        var cardTokens = promptCardText.Split(new[] { PromptBlankLine.PromptBlankIndicator }, StringSplitOptions.RemoveEmptyEntries)
 	            .Select(token => token.Trim())
 	            .ToList();
-	        var cardFrontBackgroundColor = ParseColorText(PromptCardFrontBackgroundColorText);
-	        var cardFrontTextColor = ParseColorText(PromptCardFrontTextColorText);
 	        var maxFontSize = MaxPromptTextFontSizeInDpi;
 	        var fontFamily = PromptFontFamily;
 
-            return CreateCardFront(cardFrontBackgroundColor, maxFontSize, cardTokens, fontFamily, cardFrontTextColor);
+            return CreateCardFront(PromptCardFrontBackgroundColor, maxFontSize, cardTokens, fontFamily, PromptCardFrontTextColor);
 	    }
 
 	    public SvgDocument CreateAnswerCardFront(string answerCard)
 	    {
 	        var cardTokens = new[] { answerCard };
-	        var cardFrontBackgroundColor = ParseColorText(AnswerCardFrontBackgroundColorText);
-	        var cardFrontTextColor = ParseColorText(AnswerCardFrontTextColorText);
 	        var maxFontSize = MaxAnswerTextFontSizeInDpi;
 	        var fontFamily = AnswerFontFamily;
 
-	        return CreateCardFront(cardFrontBackgroundColor, maxFontSize, cardTokens, fontFamily, cardFrontTextColor);
+	        return CreateCardFront(AnswerCardFrontBackgroundColor, maxFontSize, cardTokens, fontFamily, AnswerCardFrontTextColor);
 	    }
 
-        private SvgDocument CreateCardFront(
-            Color cardFrontBackgroundColor,
-            int maxFontSize,
-            IList<string> cardTokens,
-            FontFamily fontFamily,
+	    private SvgDocument CreateCardFront(
+	        Color cardFrontBackgroundColor,
+	        int maxFontSize,
+	        IList<string> cardTokens,
+	        FontFamily fontFamily,
 	        Color cardFrontTextColor)
-        {
-            var bitmap = CreateBitmap(ImageOrientation.Portrait);
-            var document = new SvgDocument
-            {
-                ViewBox = new SvgViewBox(0, 0, CardWidthInPixelsWithBleed, CardHeightInPixelsWithBleed)
-            };
-            var graphics = Graphics.FromImage(bitmap);
-            PrintCardBackground(document, cardFrontBackgroundColor);
+	    {
+	        using (var bitmap = CreateBitmap(ImageOrientation.Portrait))
+	        {
+	            var document = new SvgDocument
+	            {
+	                ViewBox = new SvgViewBox(0, 0, CardWidthInPixelsWithBleed, CardHeightInPixelsWithBleed)
+	            };
+	            using (var graphics = Graphics.FromImage(bitmap))
+	            {
+	                PrintCardBackground(document, cardFrontBackgroundColor);
 
-            var yOffset = (float)TopBorderPadding;
-            var textFontSize = GetTextFontSize(maxFontSize, cardTokens, yOffset, graphics, fontFamily);
-            foreach (var cardToken in cardTokens)
-            {
-                yOffset = DrawNextStringToken(
-                    yOffset,
-                    cardToken,
-                    document,
-                    graphics,
-                    fontFamily,
-                    textFontSize,
-                    cardFrontTextColor);
-            }
+	                var yOffset = (float) TopBorderPadding;
+	                var textFontSize = GetTextFontSize(maxFontSize, cardTokens, yOffset, graphics, fontFamily);
+	                foreach (var cardToken in cardTokens)
+	                {
+	                    yOffset = DrawNextStringToken(
+	                        yOffset,
+	                        cardToken,
+	                        document,
+	                        graphics,
+	                        fontFamily,
+	                        textFontSize,
+	                        cardFrontTextColor);
+	                }
+	            }
 
-            ////TODO: Add logo
+	            ////TODO: Add logo
 
-            return document;
+	            return document;
+	        }
 	    }
 
 	    private float GetTextFontSize(
@@ -337,13 +338,6 @@ namespace AdinaCardGame
 	        } while (fitsInOneLine);
 	        promptBlankLine.BlankLength--;
             return promptBlankLine.FullLineText;
-	    }
-
-	    private static Color ParseColorText(string colorText)
-	    {
-	        var tokens = colorText.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-	        var color = Color.FromArgb(int.Parse(tokens[0]), int.Parse(tokens[1]), int.Parse(tokens[2]));
-	        return color;
 	    }
 
         private void PrintCardBackground(SvgDocument document, Color backgroundColor)

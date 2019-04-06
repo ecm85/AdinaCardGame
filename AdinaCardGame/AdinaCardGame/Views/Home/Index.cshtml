@@ -3,16 +3,98 @@
         Image Generation
     </h2>
     <form method='post' action='@Url.Action("GenerateImages", "Home")' encType="multipart/form-data">
-        <div class="form-group">
-            <label for="promptsInputFile">Prompts File</label>
-            <input type="file" id="promptsInputFile" name="promptsInputFile" required>
-            <p class="help-block">The path to the file for the prompts (i.e. CAH's 'black cards')</p>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Card Data</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="promptsInputFile">Prompts File</label>
+                    <input type="file" id="promptsInputFile" name="promptsInputFile" required>
+                    <p class="help-block">The path to the file for the prompts (i.e. CAH's 'black cards')</p>
+                </div>
+                <div class="form-group">
+                    <label for="answersInputFile">Answers File</label>
+                    <input type="file" id="answersInputFile" name="answersInputFile" required>
+                    <p class="help-block">The path to the file for the answers (i.e. CAH's 'white cards')</p>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="answersInputFile">Answers File</label>
-            <input type="file" id="answersInputFile" name="answersInputFile" required>
-            <p class="help-block">The path to the file for the answers (i.e. CAH's 'white cards')</p>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Layout</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="cardWidthInInches">Card Width (In Inches)</label>
+                    <input type="number" step=".01" class="form-control" id="cardWidthInInches" name="cardWidthInInches" placeholder="Card Width" value="1.75" required>
+                </div>
+                <div class="form-group">
+                    <label for="cardHeightInInches">Card Height (In Inches)</label>
+                    <input type="number" step=".01" class="form-control" id="cardHeightInInches" name="cardHeightInInches" placeholder="Card Height" value="3" required>
+                </div>
+                <div class="form-group">
+                    <label for="bleedSizeInInches">Bleed Size (In Inches)</label>
+                    <input type="number" step=".01" class="form-control" id="bleedSizeInInches" name="bleedSizeInInches" placeholder="Bleed Size" value=".25" required>
+                </div>
+                <div class="form-group">
+                    <label for="borderPaddingInInches">Border Padding (In Inches)</label>
+                    <input type="number" step=".01" class="form-control" id="borderPaddingInInches" name="borderPaddingInInches" placeholder="Border Padding" value=".1" required>
+                </div>
+                <div class="form-group">
+                    <label for="borderRadius">Border Radius (How rounded the corners should be)</label>
+                    <input type="number" step=".01" class="form-control" id="borderRadius" name="borderRadius" placeholder="Border Radius" value="40" required>
+                </div>
+            </div>
         </div>
-        <input type='submit' className='btn btn-primary' value='Generate Images'/>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Prompt Cards (i.e. CAH's 'black cards')</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="promptFontFamily">Font</label>
+                    <input type="text" class="form-control" id="promptFontFamily" name="promptFontFamily" placeholder="Font" value="Arial" required>
+                </div>
+                <div class="form-group">
+                    <label for="maxPromptTextFontSize">Max Font Size</label>
+                    <input type="number" step=".01" class="form-control" id="maxPromptTextFontSize" name="maxPromptTextFontSize" placeholder="Max Font Size" value="15" required>
+                </div>
+                <div class="form-group">
+                    <label for="promptCardFrontBackgroundColor">Background Color</label>
+                    <input type="color" class="form-control" id="promptCardFrontBackgroundColor" name="promptCardFrontBackgroundColor" value="#000000" required>
+                </div>
+                <div class="form-group">
+                    <label for="promptCardFrontTextColor">Text Color</label>
+                    <input type="color" class="form-control" id="promptCardFrontTextColor" name="promptCardFrontTextColor" value="#FFFF00" required>
+                </div>
+            </div>
+
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Answer Cards (i.e. CAH's 'white cards')</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="answerFontFamily">Font</label>
+                    <input type="text" class="form-control" id="answerFontFamily" name="answerFontFamily" placeholder="Font" value="Arial" required>
+                </div>
+                <div class="form-group">
+                    <label for="maxAnswerTextFontSize">Max Font Size</label>
+                    <input type="number" step=".01" class="form-control" id="maxAnswerTextFontSize" name="maxAnswerTextFontSize" placeholder="Max Font Size" value="15" required>
+                </div>
+                <div class="form-group">
+                    <label for="answerCardFrontBackgroundColor">Background Color</label>
+                    <input type="color" class="form-control" id="answerCardFrontBackgroundColor" name="answerCardFrontBackgroundColor" value="#FFFF00" required>
+                </div>
+                <div class="form-group">
+                    <label for="answerCardFrontTextColor">Text Color</label>
+                    <input type="color" class="form-control" id="answerCardFrontTextColor" name="answerCardFrontTextColor" value="#000000" required>
+                </div>
+            </div>
+        </div>
+        <input type='submit' class='btn btn-primary' value='Generate Images' />
     </form>
 </div>
