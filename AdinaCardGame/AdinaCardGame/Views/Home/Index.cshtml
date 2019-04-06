@@ -1,0 +1,18 @@
+﻿<div class="row">
+    <h2>
+        Image Generation
+    </h2>
+    <form method='post' action='@Url.Action("GenerateImages", "Home")' encType="multipart/form-data">
+        <div class="form-group">
+            <label for="promptsInputFile">Prompts File</label>
+            <input type="file" id="promptsInputFile" name="promptsInputFile">
+            <p class="help-block">The path to the file for the prompts (i.e. CAH's 'black cards')</p>
+        </div>
+        <div class="form-group">
+            <label for="answersInputFile">Answers File</label>
+            <input type="file" id="answersInputFile" name="answersInputFile">
+            <p class="help-block">The path to the file for the answers (i.e. CAH's 'white cards')</p>
+        </div>
+        <input type='submit' className='btn btn-primary' value='Generate Images'/>
+    </form>
+</div>

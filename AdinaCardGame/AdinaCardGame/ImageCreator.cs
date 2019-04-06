@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,41 +9,77 @@ namespace AdinaCardGame
 {
 	public class ImageCreator
 	{
+	    public ImageCreator(
+	        float cardWidthInInches,
+	        float cardHeightInInches,
+	        float bleedSizeInInches,
+	        string promptFontFamily,
+	        string answerFontFamily,
+	        int borderRadius,
+	        float borderPaddingInInches,
+	        int maxPromptTextFontSize,
+	        int maxAnswerTextFontSize,
+	        string promptCardFrontBackgroundColorText,
+	        string promptCardFrontTextColorText,
+	        string answerCardFrontBackgroundColorText,
+	        string answerCardFrontTextColorText)
+	    {
+	        CardWidthInInches = cardWidthInInches;
+	        CardHeightInInches = cardHeightInInches;
+	        BleedSizeInInches = bleedSizeInInches;
+	        BorderRadius = borderRadius;
+	        BorderPaddingInInches = borderPaddingInInches;
+	        MaxPromptTextFontSize = maxPromptTextFontSize;
+	        MaxAnswerTextFontSize = maxAnswerTextFontSize;
+	        PromptCardFrontBackgroundColorText = promptCardFrontBackgroundColorText;
+	        PromptCardFrontTextColorText = promptCardFrontTextColorText;
+	        AnswerCardFrontBackgroundColorText = answerCardFrontBackgroundColorText;
+	        AnswerCardFrontTextColorText = answerCardFrontTextColorText;
+	        PromptFontFamily = new FontFamily(promptFontFamily);
+	        AnswerFontFamily = new FontFamily(answerFontFamily);
+	    }
 		const float DpiFactor = 300.0f / 96;
 
-	    private static float CardWidthInInches => float.Parse(ConfigurationManager.AppSettings["CardWidthInInches"]);
-		private static float CardHeightInInches => float.Parse(ConfigurationManager.AppSettings["CardHeightInInches"]);
+	    private float CardWidthInInches { get; }
+		private float CardHeightInInches { get; }
 
-		private static float BleedSizeInInches => float.Parse(ConfigurationManager.AppSettings["BleedSizeInInches"]);
+	    private float BleedSizeInInches { get; }
 
-		private static float CardWidthInInchesWithBleed => CardWidthInInches + BleedSizeInInches;
-		private static float CardHeightInInchesWithBleed => CardHeightInInches + BleedSizeInInches;
+		private float CardWidthInInchesWithBleed => CardWidthInInches + BleedSizeInInches;
+		private float CardHeightInInchesWithBleed => CardHeightInInches + BleedSizeInInches;
 
 		private const int Dpi = (int)(96 * DpiFactor);
-		private static int CardWidthInPixels => (int)(Dpi * CardWidthInInches);
-		private static int CardHeightInPixels => (int)(Dpi * CardHeightInInches);
+		private int CardWidthInPixels => (int)(Dpi * CardWidthInInches);
+		private int CardHeightInPixels => (int)(Dpi * CardHeightInInches);
 
-		private static int CardWidthInPixelsWithBleed => (int)(Dpi * CardWidthInInchesWithBleed);
-		private static int CardHeightInPixelsWithBleed => (int)(Dpi * CardHeightInInchesWithBleed);
+		private int CardWidthInPixelsWithBleed => (int)(Dpi * CardWidthInInchesWithBleed);
+		private int CardHeightInPixelsWithBleed => (int)(Dpi * CardHeightInInchesWithBleed);
 
-		private readonly FontFamily promptFontFamily = new FontFamily(ConfigurationManager.AppSettings["PromptFontFamily"]);
-	    private readonly FontFamily answerFontFamily = new FontFamily(ConfigurationManager.AppSettings["AnswerFontFamily"]);
+		private FontFamily PromptFontFamily { get; }
+	    private FontFamily AnswerFontFamily { get; }
 
-		private readonly Point origin = new Point((int) (BleedSizeInInches * Dpi), (int) (BleedSizeInInches * Dpi));
+		private Point Origin => new Point((int) (BleedSizeInInches * Dpi), (int) (BleedSizeInInches * Dpi));
 
-	    private static int BorderRadius => int.Parse(ConfigurationManager.AppSettings["BorderRadius"]);
+	    private int BorderRadius { get; }
 
-        private static int BorderPadding => (int)(float.Parse(ConfigurationManager.AppSettings["BorderPaddingInInches"]) * Dpi);
+        private int BorderPadding => (int)(BorderPaddingInInches * Dpi);
 
-	    private static int TopBorderPadding => BorderPadding;
-	    private static int RightBorderPadding => BorderPadding;
-	    private static int LeftBorderPadding => BorderPadding;
-	    private static int BottomBorderPadding => BorderPadding;
+	    private float BorderPaddingInInches { get; }
 
-        private static int MaxPromptTextFontSize => (int) (int.Parse(ConfigurationManager.AppSettings["MaxPromptTextFontSize"]) * DpiFactor);
-	    private static int MaxAnswerTextFontSize => (int)(int.Parse(ConfigurationManager.AppSettings["MaxAnswerTextFontSize"]) * DpiFactor);
+	    private int TopBorderPadding => BorderPadding;
+	    private int RightBorderPadding => BorderPadding;
+	    private int LeftBorderPadding => BorderPadding;
+	    private int BottomBorderPadding => BorderPadding;
 
-        //TODO: Potentially use these when making logo at bottom of cards
+        private int MaxPromptTextFontSizeInDpi => (int) (MaxPromptTextFontSize * DpiFactor);
+
+	    private int MaxPromptTextFontSize { get; }
+
+	    private int MaxAnswerTextFontSizeInDpi => (int)(MaxAnswerTextFontSize * DpiFactor);
+
+	    private int MaxAnswerTextFontSize { get; }
+
+	    //TODO: Potentially use these when making logo at bottom of cards
         //private const int resourceKeyImageSize = (int) (35 * DpiFactor);
         //private const int arrowImageSize = (int) (10 * DpiFactor);
         //private const int questCostImageSize = (int) (35 * DpiFactor);
@@ -53,10 +88,10 @@ namespace AdinaCardGame
         //private const int cardFrontSmallImageSize = (int) (35 * DpiFactor);
         //private const int questImageYBottomPadding = (int) (5 * DpiFactor);
 
-        private static string PromptCardFrontBackgroundColorText => ConfigurationManager.AppSettings["PromptCardFrontBackgroundColor"];
-	    private static string PromptCardFrontTextColorText => ConfigurationManager.AppSettings["PromptCardFrontTextColor"];
-	    private static string AnswerCardFrontBackgroundColorText => ConfigurationManager.AppSettings["AnswerCardFrontBackgroundColor"];
-        private static string AnswerCardFrontTextColorText => ConfigurationManager.AppSettings["AnswerCardFrontTextColor"];
+        private string PromptCardFrontBackgroundColorText { get; }
+	    private string PromptCardFrontTextColorText { get; }
+	    private string AnswerCardFrontBackgroundColorText { get; }
+        private string AnswerCardFrontTextColorText { get; }
 
         private Bitmap CreateBitmap(ImageOrientation orientation)
 	    {
@@ -84,8 +119,8 @@ namespace AdinaCardGame
 	            .ToList();
 	        var cardFrontBackgroundColor = ParseColorText(PromptCardFrontBackgroundColorText);
 	        var cardFrontTextColor = ParseColorText(PromptCardFrontTextColorText);
-	        var maxFontSize = MaxPromptTextFontSize;
-	        var fontFamily = promptFontFamily;
+	        var maxFontSize = MaxPromptTextFontSizeInDpi;
+	        var fontFamily = PromptFontFamily;
 
             return CreateCardFront(cardFrontBackgroundColor, maxFontSize, cardTokens, fontFamily, cardFrontTextColor);
 	    }
@@ -95,16 +130,19 @@ namespace AdinaCardGame
 	        var cardTokens = new[] { answerCard };
 	        var cardFrontBackgroundColor = ParseColorText(AnswerCardFrontBackgroundColorText);
 	        var cardFrontTextColor = ParseColorText(AnswerCardFrontTextColorText);
-	        var maxFontSize = MaxAnswerTextFontSize;
-	        var fontFamily = answerFontFamily;
+	        var maxFontSize = MaxAnswerTextFontSizeInDpi;
+	        var fontFamily = AnswerFontFamily;
 
 	        return CreateCardFront(cardFrontBackgroundColor, maxFontSize, cardTokens, fontFamily, cardFrontTextColor);
 	    }
 
-        private SvgDocument CreateCardFront(Color cardFrontBackgroundColor, int maxFontSize, IList<string> cardTokens, FontFamily fontFamily,
+        private SvgDocument CreateCardFront(
+            Color cardFrontBackgroundColor,
+            int maxFontSize,
+            IList<string> cardTokens,
+            FontFamily fontFamily,
 	        Color cardFrontTextColor)
         {
-            //return CreateBitmap(CardWidthInPixelsWithBleed, CardHeightInPixelsWithBleed);
             var bitmap = CreateBitmap(ImageOrientation.Portrait);
             var document = new SvgDocument
             {
@@ -114,7 +152,7 @@ namespace AdinaCardGame
             PrintCardBackground(document, cardFrontBackgroundColor);
 
             var yOffset = (float)TopBorderPadding;
-            var textFontSize = GetTextFontSize(maxFontSize, cardTokens, yOffset, graphics);
+            var textFontSize = GetTextFontSize(maxFontSize, cardTokens, yOffset, graphics, fontFamily);
             foreach (var cardToken in cardTokens)
             {
                 yOffset = DrawNextStringToken(
@@ -132,27 +170,40 @@ namespace AdinaCardGame
             return document;
 	    }
 
-	    private float GetTextFontSize(float maxFontSize, IList<string> promptCardTokens, float yOffset, Graphics graphics)
+	    private float GetTextFontSize(
+	        float maxFontSize,
+	        IList<string> promptCardTokens,
+	        float yOffset,
+	        Graphics graphics,
+	        FontFamily fontFamily)
 	    {
 	        var availableHeight = CardHeightInPixels - (yOffset + BottomBorderPadding);
 	        float heightAtNextAttempt;
 	        var nextAttempt = maxFontSize;
 	        do
             {
-                heightAtNextAttempt = GetHeightForCardAtFontSize(promptCardTokens, graphics, nextAttempt);
+                heightAtNextAttempt = GetHeightForCardAtFontSize(
+                    promptCardTokens,
+                    graphics,
+                    nextAttempt,
+                    fontFamily);
                 if (heightAtNextAttempt > availableHeight)
                     nextAttempt--;
             } while (heightAtNextAttempt > availableHeight);
 	        return nextAttempt;
 	    }
 
-	    private float GetHeightForCardAtFontSize(IList<string> promptCardTokens, Graphics graphics, float fontSize)
+	    private float GetHeightForCardAtFontSize(
+	        IList<string> promptCardTokens,
+	        Graphics graphics,
+	        float fontSize,
+	        FontFamily fontFamily)
 	    {
 	        var availableWidth = CardWidthInPixels - (LeftBorderPadding + RightBorderPadding);
 	        var size = new SizeF(
 	            availableWidth,
 	            float.MaxValue);
-	        var maxFont = new Font(promptFontFamily, fontSize, FontStyle.Regular, GraphicsUnit.Pixel);
+	        var maxFont = new Font(fontFamily, fontSize, FontStyle.Regular, GraphicsUnit.Pixel);
 	        return promptCardTokens
 	            .Sum(
 	                promptCardToken =>
@@ -190,8 +241,8 @@ namespace AdinaCardGame
 	                FontFamily = fontFamily.Name,
 	                FontSize = new SvgUnit(textFontSize),
 	                FontStyle = SvgFontStyle.Normal,
-	                X = new SvgUnitCollection {new SvgUnit(textRectangle.X + origin.X)},
-	                Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + origin.Y + height) },
+	                X = new SvgUnitCollection {new SvgUnit(textRectangle.X + Origin.X)},
+	                Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + Origin.Y + height) },
 
 	            };
 	            container.Children.Add(textElement);
@@ -230,8 +281,8 @@ namespace AdinaCardGame
 
 	                var textSpanElement = new SvgTextSpan
 	                {
-	                    X = new SvgUnitCollection {new SvgUnit(textRectangle.X + origin.X)},
-	                    Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + origin.Y + height)},
+	                    X = new SvgUnitCollection {new SvgUnit(textRectangle.X + Origin.X)},
+	                    Y = new SvgUnitCollection {new SvgUnit(textRectangle.Y + Origin.Y + height)},
 	                    Text = lineToken
 	                };
 	                textElement.Children.Add(textSpanElement);
