@@ -18,8 +18,7 @@ namespace AdinaCardGame.Controllers
 
         //TODO: Client - get all numeric values
         //TODO: Client - make values required
-        //TODO: Get colors via picker?
-        //TODO: 
+        //TODO: Client - Get colors via picker?
         //TODO: Classes for all the input?
         //TODO: Build pipeline
         [HttpPost]
@@ -31,8 +30,6 @@ namespace AdinaCardGame.Controllers
             var imageCreationProcess = new ImageCreationProcess();
             var dateStamp = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture);
             var fileName = $"Card Images {dateStamp}.zip";
-
-            //TODO: Skip empty lines or lines that start with //, and maybe use the correct encoding?
 
             var cardWidthInInches = 1.75f;
             var cardHeightInInches = 3f;
@@ -84,11 +81,5 @@ namespace AdinaCardGame.Controllers
                 .Where(line => !line.StartsWith("//") && !string.IsNullOrWhiteSpace(line))
                 .ToList();
         }
-
-        //private static IEnumerable<string> LoadCards(string path)
-        //{
-        //    return System.IO.File.ReadAllLines(path, Encoding.Default)
-        //        ;
-        //}
     }
 }
