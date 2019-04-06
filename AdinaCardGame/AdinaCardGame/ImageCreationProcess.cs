@@ -8,8 +8,8 @@ namespace AdinaCardGame
     public class ImageCreationProcess
     {
         public byte[] Run(
-            IEnumerable<string> answerCards,
             IEnumerable<string> promptCards,
+            IEnumerable<string> answerCards,
             float cardWidthInInches,
             float cardHeightInInches,
             float bleedSizeInInches,

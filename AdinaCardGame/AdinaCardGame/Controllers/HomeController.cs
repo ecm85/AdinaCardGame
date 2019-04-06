@@ -16,7 +16,10 @@ namespace AdinaCardGame.Controllers
             return View();
         }
 
-        //TODO: Client
+        //TODO: Client - get all numeric values
+        //TODO: Client - make values required
+        //TODO: Get colors via picker?
+        //TODO: 
         //TODO: Classes for all the input?
         //TODO: Build pipeline
         [HttpPost]
