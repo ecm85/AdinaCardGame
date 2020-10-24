@@ -1,29 +1,29 @@
-﻿<h2>
+﻿<h3>
     Image Generation
-</h2>
+</h3>
 <form method='post' action='@Url.Action("GenerateImages", "Home")' encType="multipart/form-data">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Card Data</h3>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Card Data</h5>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <div class="form-group">
                 <label for="promptsInputFile">Prompts File</label>
-                <input type="file" id="promptsInputFile" name="promptsInputFile" required>
-                <p class="help-block">The path to the file for the prompts (i.e. CAH's 'black cards')</p>
+                <input type="file" id="promptsInputFile" name="promptsInputFile" required class="form-control-file">
+                <small class="form-text text-muted">The path to the file for the prompts (i.e. CAH's 'black cards')</small>
             </div>
             <div class="form-group">
                 <label for="answersInputFile">Answers File</label>
-                <input type="file" id="answersInputFile" name="answersInputFile" required>
-                <p class="help-block">The path to the file for the answers (i.e. CAH's 'white cards')</p>
+                <input type="file" id="answersInputFile" name="answersInputFile" required class="form-control-file">
+                <small class="form-text text-muted">The path to the file for the answers (i.e. CAH's 'white cards')</small>
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Layout</h3>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Layout</h5>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <div class="form-group">
                 <label for="cardWidthInInches">Card Width (In Inches)</label>
                 <input type="number" step=".01" class="form-control" id="cardWidthInInches" name="cardWidthInInches" placeholder="Card Width" value="1.75" required>
@@ -47,11 +47,11 @@
         </div>
     </div>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Prompt Cards (i.e. CAH's 'black cards')</h3>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Prompt Cards (i.e. CAH's 'black cards')</h5>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <div class="form-group">
                 <label for="promptFontFamily">Font</label>
                 <input type="text" class="form-control" id="promptFontFamily" name="promptFontFamily" placeholder="Font" value="Arial" required>
@@ -71,11 +71,11 @@
         </div>
 
     </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Answer Cards (i.e. CAH's 'white cards')</h3>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Answer Cards (i.e. CAH's 'white cards')</h5>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <div class="form-group">
                 <label for="answerFontFamily">Font</label>
                 <input type="text" class="form-control" id="answerFontFamily" name="answerFontFamily" placeholder="Font" value="Arial" required>
