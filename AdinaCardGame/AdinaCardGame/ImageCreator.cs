@@ -114,7 +114,7 @@ namespace AdinaCardGame
 
 	    private Bitmap CreateBitmap(int width, int height)
 	    {
-	        var bitmap = new Bitmap(width, height, PixelFormat.Format16bppRgb555);
+	        var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 	        bitmap.SetResolution(Dpi, Dpi);
 	        return bitmap;
 	    }
