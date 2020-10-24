@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using ICSharpCode.SharpZipLib.Zip;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 
 namespace AdinaCardGame
@@ -57,18 +57,19 @@ namespace AdinaCardGame
 
             using (var memoryStream = new MemoryStream())
             {
-                using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                using (var zipArchive = new ZipOutputStream(memoryStream))
                 {
+                    zipArchive.IsStreamOwner = false;
                     foreach (var card in allCards)
                     {
                         var fileName = $"{card.FilePrefix} Card {card.Index}.svg";
-                        var entry = zipArchive.CreateEntry(fileName);
+                        var newEntry = new ZipEntry(fileName);
+                        zipArchive.PutNextEntry(newEntry);
                         var document = card.CreateImage(card.Card);
                         using (var singleFileStream = new MemoryStream())
                         {
                             document.Write(singleFileStream);
-                            using (var zipStream = entry.Open())
-                                zipStream.Write(singleFileStream.ToArray());
+                            zipArchive.Write(singleFileStream.ToArray());
                         }
                     }
                 }
