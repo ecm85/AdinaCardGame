@@ -64,8 +64,12 @@ namespace AdinaCardGame
                         var fileName = $"{card.FilePrefix} Card {card.Index}.svg";
                         var entry = zipArchive.CreateEntry(fileName);
                         var document = card.CreateImage(card.Card);
-                        using (var stream = entry.Open())
-                            document.Write(stream, false);
+                        using (var singleFileStream = new MemoryStream())
+                        {
+                            document.Write(singleFileStream);
+                            using (var zipStream = entry.Open())
+                                zipStream.Write(singleFileStream.ToArray());
+                        }
                     }
                 }
                 return memoryStream.ToArray();
