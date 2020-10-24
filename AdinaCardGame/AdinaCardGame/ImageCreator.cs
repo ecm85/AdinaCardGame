@@ -38,7 +38,7 @@ namespace AdinaCardGame
 
 			var fontCollection = new PrivateFontCollection();
 			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "arial.ttf"));
-			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "arialbd.ttf"));
+			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "arialbdfoo.ttf"));
 			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "arialbi.ttf"));
 			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "ariali.ttf"));
 			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "ariblk.ttf"));
