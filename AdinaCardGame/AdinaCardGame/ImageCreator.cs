@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Svg;
@@ -14,8 +15,6 @@ namespace AdinaCardGame
 	        float cardWidthInInches,
 	        float cardHeightInInches,
 	        float bleedSizeInInches,
-	        string promptFontFamily,
-	        string answerFontFamily,
 	        float borderRadius,
 	        float borderPaddingInInches,
 	        float maxPromptTextFontSize,
@@ -36,8 +35,15 @@ namespace AdinaCardGame
 	        PromptCardFrontTextColor = promptCardFrontTextColor;
 	        AnswerCardFrontBackgroundColor = answerCardFrontBackgroundColor;
 	        AnswerCardFrontTextColor = answerCardFrontTextColor;
-	        PromptFontFamily = new FontFamily(promptFontFamily);
-	        AnswerFontFamily = new FontFamily(answerFontFamily);
+
+			var fontCollection = new PrivateFontCollection();
+			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "arial.ttf"));
+			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "arialbd.ttf"));
+			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "arialbi.ttf"));
+			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "ariali.ttf"));
+			fontCollection.AddFontFile(System.IO.Path.Combine("fonts", "ariblk.ttf"));
+	        PromptFontFamily = new FontFamily("Arial", fontCollection);
+	        AnswerFontFamily = new FontFamily("Arial", fontCollection);
 	    }
 		const float DpiFactor = 300.0f / 96;
 
