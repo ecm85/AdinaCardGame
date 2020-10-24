@@ -65,7 +65,7 @@ namespace AdinaCardGame
                         var entry = zipArchive.CreateEntry(fileName);
                         var document = card.CreateImage(card.Card);
                         using (var stream = entry.Open())
-                            document.Write(stream);
+                            document.Write(stream, false);
                     }
                 }
                 return memoryStream.ToArray();
